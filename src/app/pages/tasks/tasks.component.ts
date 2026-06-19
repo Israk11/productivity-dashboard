@@ -9,6 +9,7 @@ import { Task } from '../../services/task.service';
 })
 export class TasksComponent {
 
+  // test sonar
   tasks: Task[] = [];
 
   constructor(private taskService: TaskService) {}
