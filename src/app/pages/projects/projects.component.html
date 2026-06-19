@@ -1,0 +1,13 @@
+<h2>Projects</h2>
+
+<ul>
+  @for(project of projects; track project.name) {
+
+    <li>
+      <strong>{{ project.name }}</strong>
+      -
+      {{ project.status }}
+    </li>
+
+  }
+</ul>

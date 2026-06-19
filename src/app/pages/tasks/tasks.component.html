@@ -1,0 +1,18 @@
+<h2>Tasks</h2>
+
+<ul>
+  @for(task of tasks; track task.id) {
+
+    <li>
+      <input
+        type="checkbox"
+        [checked]="task.completed"
+        (change)="toggleTask(task.id)">
+
+      <span [style.text-decoration]="task.completed ? 'line-through' : 'none'">
+        {{ task.title }}
+      </span>
+    </li>
+
+  }
+</ul>

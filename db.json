@@ -1,0 +1,28 @@
+{
+  "projects": [
+    {
+      "id": 1,
+      "name": "AI Agent Integration",
+      "status": "In Progress",
+      "owner": "Israk"
+    },
+    {
+      "id": 2,
+      "name": "SonarQube Setup",
+      "status": "Completed",
+      "owner": "DevOps"
+    }
+  ],
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Setup Angular Project",
+      "completed": true
+    },
+    {
+      "id": 2,
+      "title": "Build Reactive Services",
+      "completed": false
+    }
+  ]
+}
