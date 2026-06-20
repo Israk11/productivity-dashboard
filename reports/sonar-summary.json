@@ -1,0 +1,19 @@
+﻿{
+    "totalIssues":  20,
+    "severityCounts":  {
+                           "blocker":  2,
+                           "info":  0,
+                           "minor":  3,
+                           "major":  15,
+                           "critical":  0
+                       },
+    "categoryCounts":  {
+                           "vulnerabilities":  1,
+                           "bugs":  1,
+                           "securityHotspots":  0,
+                           "codeSmells":  18
+                       },
+    "qualityGateStatus":  "NONE",
+    "autoFixableIssueCount":  20,
+    "generatedAt":  "2026-06-20T14:13:54+05:30"
+}
