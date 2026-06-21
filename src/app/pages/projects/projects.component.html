@@ -1,13 +1,78 @@
-<h2>Projects</h2>
+<div class="projects-page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Projects <span class="badge">{{ projects.length }}</span></h1>
+    </div>
+    <button class="btn-add" (click)="showForm = !showForm">
+      {{ showForm ? '✕ Cancel' : '+ New Project' }}
+    </button>
+  </div>
 
-<ul>
-  @for(project of projects; track project.name) {
+  @if(showForm) {
+    <form class="add-form" [formGroup]="projectForm" (ngSubmit)="submitProject()">
+      <h2 class="form-title">New Project</h2>
 
-    <li>
-      <strong>{{ project.name }}</strong>
-      -
-      {{ project.status }}
-    </li>
+      <div class="form-grid">
+        <div class="field">
+          <label>Project Name *</label>
+          <input type="text" formControlName="name" placeholder="e.g. API Gateway Refactor">
+          @if(isInvalid('name')) { <span class="error">Name is required (min 3 chars)</span> }
+        </div>
 
+        <div class="field">
+          <label>Status *</label>
+          <select formControlName="status">
+            @for(s of statusOptions; track s) {
+              <option [value]="s">{{ s }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Developer / Owner *</label>
+          <input type="text" formControlName="developer" placeholder="e.g. Jane Smith">
+          @if(isInvalid('developer')) { <span class="error">Developer name is required</span> }
+        </div>
+
+        <div class="field">
+          <label>Start Date *</label>
+          <input type="date" formControlName="startDate">
+          @if(isInvalid('startDate')) { <span class="error">Start date is required</span> }
+        </div>
+
+        <div class="field">
+          <label>Deadline *</label>
+          <input type="date" formControlName="endDate">
+          @if(isInvalid('endDate')) { <span class="error">Deadline is required</span> }
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-submit" [disabled]="submitting">
+          {{ submitting ? 'Saving…' : 'Add Project' }}
+        </button>
+        <button type="button" class="btn-cancel" (click)="showForm = false">Cancel</button>
+      </div>
+    </form>
   }
-</ul>
+
+  <div class="projects-grid">
+    @for(project of projects; track project.id) {
+      <div class="project-card">
+        <div class="project-top">
+          <span class="project-name">{{ project.name }}</span>
+          <span class="status-badge" [ngClass]="getStatusClass(project.status)">{{ project.status }}</span>
+        </div>
+        <div class="project-meta">
+          <span class="meta-item">👤 {{ project.owner }}</span>
+          @if(project.startDate) {
+            <span class="meta-item">📅 {{ project.startDate }}</span>
+          }
+          @if(project.endDate) {
+            <span class="meta-item">🏁 {{ project.endDate }}</span>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

@@ -1,34 +1,37 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, catchError, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, tap, throwError } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 
 export interface Project {
-  id: number;
+  id?: number;
   name: string;
   status: string;
   owner: string;
+  developer?: string;
+  startDate?: string;
+  endDate?: string;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class ProjectService {
 
-  private apiUrl = 'http://localhost:3000/projects';
-
-  private projectsSubject = new BehaviorSubject<Project[]>([]);
+  private readonly apiUrl = 'http://localhost:3000/projects';
+  private readonly projectsSubject = new BehaviorSubject<Project[]>([]);
   projects$ = this.projectsSubject.asObservable();
 
-  constructor(private http: HttpClient) {}
+  constructor(private readonly http: HttpClient) {}
 
   loadProjects() {
     this.http.get<Project[]>(this.apiUrl)
-      .pipe(
-        catchError(err => this.handleError(err))
-      )
-      .subscribe(data => {
-        this.projectsSubject.next(data);
-      });
+      .pipe(catchError(err => this.handleError(err)))
+      .subscribe(data => this.projectsSubject.next(data));
+  }
+
+  addProject(project: Omit<Project, 'id'>) {
+    return this.http.post<Project>(this.apiUrl, project).pipe(
+      tap(created => this.projectsSubject.next([...this.projectsSubject.value, created])),
+      catchError(err => this.handleError(err))
+    );
   }
 
   getProjectById(id: number) {

@@ -1,18 +1,84 @@
-<h2>Tasks</h2>
+<div class="tasks-page">
+  <div class="page-header">
+    <h1 class="page-title">Tasks <span class="badge">{{ tasks.length }}</span></h1>
+    <button class="btn-add" (click)="showForm = !showForm">
+      {{ showForm ? '✕ Cancel' : '+ New Task' }}
+    </button>
+  </div>
 
-<ul>
-  @for(task of tasks; track task.id) {
+  @if(showForm) {
+    <form class="add-form" [formGroup]="taskForm" (ngSubmit)="submitTask()">
+      <h2 class="form-title">New Task</h2>
 
-    <li>
-      <input
-        type="checkbox"
-        [checked]="task.completed"
-        (change)="toggleTask(task.id)">
+      <div class="form-grid">
+        <div class="field full-width">
+          <label>Task Title *</label>
+          <input type="text" formControlName="title" placeholder="e.g. Write unit tests for auth module">
+          @if(isInvalid('title')) { <span class="error">Title is required (min 3 chars)</span> }
+        </div>
 
-      <span [style.text-decoration]="task.completed ? 'line-through' : 'none'">
-        {{ task.title }}
-      </span>
-    </li>
+        <div class="field">
+          <label>Priority *</label>
+          <select formControlName="priority">
+            @for(p of priorityOptions; track p) {
+              <option [value]="p">{{ p }}</option>
+            }
+          </select>
+        </div>
 
+        <div class="field">
+          <label>Assigned Developer *</label>
+          <input type="text" formControlName="assignedTo" placeholder="e.g. Alex Johnson">
+          @if(isInvalid('assignedTo')) { <span class="error">Assigned developer is required</span> }
+        </div>
+
+        <div class="field">
+          <label>Start Date *</label>
+          <input type="date" formControlName="startDate">
+          @if(isInvalid('startDate')) { <span class="error">Start date is required</span> }
+        </div>
+
+        <div class="field">
+          <label>Due Date *</label>
+          <input type="date" formControlName="dueDate">
+          @if(isInvalid('dueDate')) { <span class="error">Due date is required</span> }
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-submit" [disabled]="submitting">
+          {{ submitting ? 'Saving…' : 'Add Task' }}
+        </button>
+        <button type="button" class="btn-cancel" (click)="showForm = false">Cancel</button>
+      </div>
+    </form>
   }
-</ul>
+
+  <div class="filter-tabs">
+    <button class="tab" [class.active]="filter === 'all'"       (click)="filter = 'all'">All ({{ tasks.length }})</button>
+    <button class="tab" [class.active]="filter === 'pending'"   (click)="filter = 'pending'">Pending ({{ pendingCount }})</button>
+    <button class="tab" [class.active]="filter === 'completed'" (click)="filter = 'completed'">Completed ({{ completedCount }})</button>
+  </div>
+
+  <ul class="task-list">
+    @for(task of filteredTasks; track task.id) {
+      <li class="task-item" [class.completed]="task.completed">
+        <label [for]="'task-' + task.id" class="task-label">
+          <input [id]="'task-' + task.id" type="checkbox" [checked]="task.completed" (change)="toggleTask(task.id!)">
+          <span class="task-title">{{ task.title }}</span>
+        </label>
+        <div class="task-meta">
+          @if(task.priority) {
+            <span class="priority-tag" [class]="priorityClass(task.priority)">{{ task.priority }}</span>
+          }
+          @if(task.assignedTo) {
+            <span class="meta-chip">👤 {{ task.assignedTo }}</span>
+          }
+          @if(task.dueDate) {
+            <span class="meta-chip">🏁 {{ task.dueDate }}</span>
+          }
+        </div>
+      </li>
+    }
+  </ul>
+</div>

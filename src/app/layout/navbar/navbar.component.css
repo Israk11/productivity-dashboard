@@ -1,10 +1,32 @@
 .navbar {
-  background: #2c3e50;
-  padding: 15px;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
-.navbar a {
-  color: white;
+.navbar-brand { display: flex; align-items: center; gap: 8px; }
+.brand-icon { font-size: 1.4rem; }
+.brand-name { color: white; font-weight: 700; font-size: 1.1rem; letter-spacing: -0.3px; }
+
+.navbar-links { display: flex; gap: 4px; }
+.navbar-links a {
+  color: #94a3b8;
   text-decoration: none;
-  margin-right: 20px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
 }
+.navbar-links a:hover { color: white; background: rgba(255,255,255,0.08); }
+.navbar-links a.active { color: white; background: rgba(99,102,241,0.4); }

@@ -1,28 +1,47 @@
 {
   "projects": [
     {
-      "id": 1,
+      "id": "1",
       "name": "AI Agent Integration",
       "status": "In Progress",
       "owner": "Israk"
     },
     {
-      "id": 2,
+      "id": "2",
       "name": "SonarQube Setup",
       "status": "Completed",
       "owner": "DevOps"
+    },
+    {
+      "name": "API gateway refactor",
+      "status": "In Progress",
+      "owner": "James",
+      "developer": "James",
+      "startDate": "2026-06-21",
+      "endDate": "2026-06-28",
+      "id": "GcZCYSq-Wr8"
     }
   ],
   "tasks": [
     {
-      "id": 1,
+      "id": "1",
       "title": "Setup Angular Project",
       "completed": true
     },
     {
-      "id": 2,
+      "id": "2",
       "title": "Build Reactive Services",
       "completed": false
+    },
+    {
+      "title": "Write unit test cases for modules",
+      "completed": false,
+      "priority": "Medium",
+      "assignedTo": "Alex",
+      "startDate": "2026-06-23",
+      "dueDate": "2026-07-11",
+      "id": "OP8suCEBiVY"
     }
-  ]
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
 }

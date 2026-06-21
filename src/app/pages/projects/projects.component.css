@@ -1,0 +1,126 @@
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.project-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.project-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+
+.project-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.project-name { font-weight: 600; font-size: 0.95rem; }
+.project-bottom { border-top: 1px solid var(--border); padding-top: 12px; }
+.owner { font-size: 0.83rem; color: var(--text-muted); }
+
+.status-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.status-completed { background: #dcfce7; color: #166534; }
+.status-progress  { background: #dbeafe; color: #1e40af; }
+.status-review    { background: #fef9c3; color: #854d0e; }
+.status-default   { background: #f1f5f9; color: #475569; }
+
+/* existing styles stay, add below: */
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.btn-add {
+  padding: 9px 20px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-add:hover { background: var(--primary-dark); }
+
+.add-form {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin-bottom: 28px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+.form-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 20px; }
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
+
+.field input, .field select {
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  background: var(--bg);
+  color: var(--text);
+  transition: border-color 0.2s;
+}
+.field input:focus, .field select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+}
+
+.error { font-size: 0.75rem; color: var(--danger); }
+
+.form-actions { display: flex; gap: 10px; }
+.btn-submit {
+  padding: 9px 24px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.88rem;
+  transition: background 0.2s;
+}
+.btn-submit:hover:not(:disabled) { background: var(--primary-dark); }
+.btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-cancel {
+  padding: 9px 20px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.88rem;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+.btn-cancel:hover { border-color: var(--danger); color: var(--danger); }
+
+.project-bottom { border-top: 1px solid var(--border); padding-top: 12px; }
+.project-meta { display: flex; flex-wrap: wrap; gap: 10px; border-top: 1px solid var(--border); padding-top: 12px; }
+.meta-item { font-size: 0.78rem; color: var(--text-muted); }
+
+.status-hold      { background: #f0fdf4; color: #374151; }
+.status-cancelled { background: #fef2f2; color: #991b1b; }

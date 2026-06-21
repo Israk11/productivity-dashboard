@@ -1,16 +1,41 @@
 <h2>Developer Productivity Dashboard</h2>
 
-<div>
-  <h3>Total Projects</h3>
-  <p>{{ totalProjects }}</p>
-</div>
+<div class="dashboard">
+  <div class="page-header">
+    <h1 class="page-title">Dashboard</h1>
+    <p class="page-subtitle">Welcome back! Here's your productivity overview.</p>
+  </div>
 
-<div>
-  <h3>Completed Tasks</h3>
-  <p>{{ completedTasks }}</p>
-</div>
+  <div class="stats-grid">
+    <div class="stat-card card-blue">
+      <div class="stat-icon">📁</div>
+      <div class="stat-value">{{ totalProjects }}</div>
+      <div class="stat-label">Total Projects</div>
+    </div>
+    <div class="stat-card card-green">
+      <div class="stat-icon">✅</div>
+      <div class="stat-value">{{ completedTasks }}</div>
+      <div class="stat-label">Completed Tasks</div>
+    </div>
+    <div class="stat-card card-orange">
+      <div class="stat-icon">⏳</div>
+      <div class="stat-value">{{ pendingTasks }}</div>
+      <div class="stat-label">Pending Tasks</div>
+    </div>
+    <div class="stat-card card-purple">
+      <div class="stat-icon">📈</div>
+      <div class="stat-value">{{ completionRate }}%</div>
+      <div class="stat-label">Completion Rate</div>
+    </div>
+  </div>
 
-<div>
-  <h3>Pending Tasks</h3>
-  <p>{{ pendingTasks }}</p>
+  <div class="progress-section">
+    <div class="progress-header">
+      <span>Overall Progress</span>
+      <span class="progress-pct">{{ completedTasks }} / {{ completedTasks + pendingTasks }} tasks</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" [style.width.%]="completionRate"></div>
+    </div>
+  </div>
 </div>

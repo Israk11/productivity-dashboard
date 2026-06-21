@@ -1,5 +1,17 @@
 <nav class="navbar">
-  <a routerLink="/dashboard">Dashboard</a>
-  <a routerLink="/projects">Projects</a>
-  <a routerLink="/tasks">Tasks</a>
+  <div class="navbar-brand">
+    <span class="brand-icon">⚡</span>
+    <span class="brand-name">DevDash</span>
+  </div>
+  <div class="navbar-links">
+    <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+      <span>📊</span> Dashboard
+    </a>
+    <a routerLink="/projects" routerLinkActive="active">
+      <span>📁</span> Projects
+    </a>
+    <a routerLink="/tasks" routerLinkActive="active">
+      <span>✅</span> Tasks
+    </a>
+  </div>
 </nav>
