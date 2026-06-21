@@ -29,13 +29,21 @@ Group into: **Bugs**, **Vulnerabilities**, **Security Hotspots**, **Code Smells*
 
 ## Step 4 — Generate Reports
 
-Create the `reports/` directory if missing, then create or update all four files below.
+Create the `reports/` directory if missing, then create or update files below.
 
 ### `reports/sonar-issues.csv`
 
-Columns: `Priority, Category, Severity, File, Line, Rule, Issue, Auto Fixable, Current Code, Suggested Code, Estimated Effort, Fix Strategy`
+Columns: `Priority, Category, Severity, File, Line, Rule, Issue, Auto Fixable, Current Code, Suggested Code, Estimated Effort, Fix Strategy, New Bug Cause`
 
 Keep code snippets single-line.
+For issues identified as newly introduced bugs, populate `New Bug Cause` with the likely source (for example: recent form field addition without label association, refactor side effect, rule/config change). Leave blank or use `N/A` for non-new issues.
+
+Required format for `New Bug Cause`: `Change Type | Trigger | Evidence`
+- `Change Type` (required for new bugs): one of `New Feature`, `Refactor`, `Dependency Update`, `Rule/Config Change`, `Unknown`
+- `Trigger` (required for new bugs): short phrase (3-12 words) describing what introduced the bug
+- `Evidence` (required for new bugs): concrete reference using `file-path:line` or commit/change note
+- Use exact pipe separators (`|`) with single spaces around each pipe.
+- For non-new issues, use exactly `N/A`.
 
 ### `reports/remediation-plan.md`
 
