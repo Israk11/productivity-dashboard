@@ -12,14 +12,14 @@
 
       <div class="form-grid">
         <div class="field full-width">
-          <label>Task Title *</label>
-          <input type="text" formControlName="title" placeholder="e.g. Write unit tests for auth module">
+          <label for="task-title">Task Title *</label>
+          <input id="task-title" type="text" formControlName="title" placeholder="e.g. Write unit tests for auth module">
           @if(isInvalid('title')) { <span class="error">Title is required (min 3 chars)</span> }
         </div>
 
         <div class="field">
-          <label>Priority *</label>
-          <select formControlName="priority">
+          <label for="task-priority">Priority *</label>
+          <select id="task-priority" formControlName="priority">
             @for(p of priorityOptions; track p) {
               <option [value]="p">{{ p }}</option>
             }
@@ -27,20 +27,20 @@
         </div>
 
         <div class="field">
-          <label>Assigned Developer *</label>
-          <input type="text" formControlName="assignedTo" placeholder="e.g. Alex Johnson">
+          <label for="task-assigned-to">Assigned Developer *</label>
+          <input id="task-assigned-to" type="text" formControlName="assignedTo" placeholder="e.g. Alex Johnson">
           @if(isInvalid('assignedTo')) { <span class="error">Assigned developer is required</span> }
         </div>
 
         <div class="field">
-          <label>Start Date *</label>
-          <input type="date" formControlName="startDate">
+          <label for="task-start-date">Start Date *</label>
+          <input id="task-start-date" type="date" formControlName="startDate">
           @if(isInvalid('startDate')) { <span class="error">Start date is required</span> }
         </div>
 
         <div class="field">
-          <label>Due Date *</label>
-          <input type="date" formControlName="dueDate">
+          <label for="task-due-date">Due Date *</label>
+          <input id="task-due-date" type="date" formControlName="dueDate">
           @if(isInvalid('dueDate')) { <span class="error">Due date is required</span> }
         </div>
       </div>

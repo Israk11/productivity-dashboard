@@ -14,14 +14,14 @@
 
       <div class="form-grid">
         <div class="field">
-          <label>Project Name *</label>
-          <input  type="text" formControlName="name" placeholder="e.g. API Gateway Refactor">
+          <label for="project-name">Project Name *</label>
+          <input id="project-name" type="text" formControlName="name" placeholder="e.g. API Gateway Refactor">
           @if(isInvalid('name')) { <span class="error">Name is required (min 3 chars)</span> }
         </div>
 
         <div class="field">
-          <label>Status *</label>
-          <select formControlName="status">
+          <label for="project-status">Status *</label>
+          <select id="project-status" formControlName="status">
             @for(s of statusOptions; track s) {
               <option [value]="s">{{ s }}</option>
             }
@@ -29,20 +29,20 @@
         </div>
 
         <div class="field">
-          <label>Developer / Owner *</label>
-          <input type="text" formControlName="developer" placeholder="e.g. Jane Smith">
+          <label for="project-developer">Developer / Owner *</label>
+          <input id="project-developer" type="text" formControlName="developer" placeholder="e.g. Jane Smith">
           @if(isInvalid('developer')) { <span class="error">Developer name is required</span> }
         </div>
 
         <div class="field">
-          <label>Start Date *</label>
-          <input type="date" formControlName="startDate">
+          <label for="project-start-date">Start Date *</label>
+          <input id="project-start-date" type="date" formControlName="startDate">
           @if(isInvalid('startDate')) { <span class="error">Start date is required</span> }
         </div>
 
         <div class="field">
-          <label>Deadline *</label>
-          <input type="date" formControlName="endDate">
+          <label for="project-end-date">Deadline *</label>
+          <input id="project-end-date" type="date" formControlName="endDate">
           @if(isInvalid('endDate')) { <span class="error">Deadline is required</span> }
         </div>
       </div>
