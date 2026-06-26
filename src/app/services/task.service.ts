@@ -24,7 +24,10 @@ export class TaskService {
   loadTasks() {
     this.http.get<Task[]>(this.apiUrl)
       .pipe(catchError(err => this.handleError(err)))
-      .subscribe(data => this.tasksSubject.next(data));
+      .subscribe((data) => {
+        this.tasksSubject.next(data);
+        console.log('Tasks loaded:', data);
+      });
   }
 
   addTask(task: Omit<Task, 'id'>) {

@@ -24,7 +24,11 @@ export class ProjectService {
   loadProjects() {
     this.http.get<Project[]>(this.apiUrl)
       .pipe(catchError(err => this.handleError(err)))
-      .subscribe(data => this.projectsSubject.next(data));
+      .subscribe((data) => {
+        this.projectsSubject.next(data);
+        console.log('Projects loaded:', data);
+      });
+
   }
 
   addProject(project: Omit<Project, 'id'>) {
