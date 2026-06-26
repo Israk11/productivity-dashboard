@@ -22,6 +22,7 @@ export class ProjectService {
   constructor(private readonly http: HttpClient) {}
 
   loadProjects() {
+    const tempUrl = this.apiUrl;
     this.http.get<Project[]>(this.apiUrl)
       .pipe(catchError(err => this.handleError(err)))
       .subscribe((data) => {

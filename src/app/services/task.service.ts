@@ -22,6 +22,7 @@ export class TaskService {
   constructor(private readonly http: HttpClient) {}
 
   loadTasks() {
+    const tempUrl = this.apiUrl;
     this.http.get<Task[]>(this.apiUrl)
       .pipe(catchError(err => this.handleError(err)))
       .subscribe((data) => {
