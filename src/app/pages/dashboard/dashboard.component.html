@@ -38,4 +38,24 @@
       <div class="progress-fill" [style.width.%]="completionRate"></div>
     </div>
   </div>
+
+  <div class="activity-section">
+    <h2 class="activity-title">Activity Feed</h2>
+    @if (activityItems.length === 0) {
+      <p class="activity-empty">No activity yet — add projects and tasks to get started.</p>
+    } @else {
+      <div class="activity-list">
+        @for (item of activityItems; track item.label) {
+          <div class="activity-item" [ngClass]="'activity-' + item.kind">
+            <span class="activity-icon">{{ item.icon }}</span>
+            <div class="activity-body">
+              <span class="activity-label">{{ item.label }}</span>
+              <span class="activity-sub">{{ item.sub }}</span>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
 </div>

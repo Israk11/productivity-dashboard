@@ -1,84 +1,188 @@
-<div class="tasks-page">
+<div class="container">
+
+  @if (toast) {
+    <div class="toast" [ngClass]="{'toast-error': toast.type === 'error'}">
+      {{ toast.message }}
+    </div>
+  }
+
   <div class="page-header">
-    <h1 class="page-title">Tasks <span class="badge">{{ tasks.length }}</span></h1>
-    <button class="btn-add" (click)="showForm = !showForm">
-      {{ showForm ? '✕ Cancel' : '+ New Task' }}
+    <div>
+      <h1 class="page-title">Tasks</h1>
+      <p class="page-subtitle">{{ pendingCount }} pending · {{ completedCount }} completed</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-secondary" (click)="markAllComplete()">✔ Mark All Done</button>
+      <button class="btn-secondary" (click)="exportCSV()">⬇ Export CSV</button>
+      <button class="btn-add" (click)="openModal()">+ Add Task</button>
+    </div>
+  </div>
+
+  <div class="controls-row">
+    <input
+      class="search-input"
+      type="text"
+      placeholder="🔍 Search by title or developer..."
+      [value]="searchQuery"
+      (input)="setSearchQuery($event)"
+    />
+    <select class="sort-select" (change)="setSortField($event)">
+      <option value="">Sort by…</option>
+      <option value="dueDate">Due Date</option>
+      <option value="priority">Priority</option>
+      <option value="title">Title A–Z</option>
+    </select>
+  </div>
+
+  <div class="filter-tabs">
+    <button class="tab" [class.active]="filter === 'all'" (click)="setFilter('all')">
+      All ({{ tasks.length }})
+    </button>
+    <button class="tab" [class.active]="filter === 'pending'" (click)="setFilter('pending')">
+      Pending ({{ pendingCount }})
+    </button>
+    <button class="tab" [class.active]="filter === 'completed'" (click)="setFilter('completed')">
+      Completed ({{ completedCount }})
     </button>
   </div>
 
-  @if(showForm) {
-    <form class="add-form" [formGroup]="taskForm" (ngSubmit)="submitTask()">
-      <h2 class="form-title">New Task</h2>
-
-      <div class="form-grid">
-        <div class="field full-width">
-          <label for="task-title">Task Title *</label>
-          <input id="task-title" type="text" formControlName="title" placeholder="e.g. Write unit tests for auth module">
-          @if(isInvalid('title')) { <span class="error">Title is required (min 3 chars)</span> }
-        </div>
-
-        <div class="field">
-          <label for="task-priority">Priority *</label>
-          <select id="task-priority" formControlName="priority">
-            @for(p of priorityOptions; track p) {
-              <option [value]="p">{{ p }}</option>
+  @if (filteredTasks.length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon">✅</div>
+      <p class="empty-title">No tasks here</p>
+      <p class="empty-text">
+        @if (searchQuery) { No results for "{{ searchQuery }}" }
+        @else { Click "+ Add Task" to create your first task. }
+      </p>
+    </div>
+  } @else {
+    <div class="task-list">
+      @for (task of filteredTasks; track task.id) {
+        <div class="task-item" [class.completed]="task.completed">
+          <div class="task-main">
+            <label class="task-label">
+              <input
+                type="checkbox"
+                [checked]="task.completed"
+                (change)="toggleTask(task.id!)"
+                [attr.aria-label]="'Mark ' + task.title + ' as done'"
+              />
+              <span class="task-title">{{ task.title }}</span>
+            </label>
+            <div class="task-actions">
+              <button class="btn-icon btn-edit" (click)="openModal(task)" aria-label="Edit task">✏️</button>
+              <button class="btn-icon btn-delete" (click)="deleteTask(task.id!)" aria-label="Delete task">🗑️</button>
+            </div>
+          </div>
+          <div class="task-meta">
+            @if (task.priority) {
+              <span class="priority-tag" [ngClass]="priorityClass(task.priority)">{{ task.priority }}</span>
             }
-          </select>
+            @if (task.assignedTo) {
+              <span class="meta-chip">👤 {{ task.assignedTo }}</span>
+            }
+            @if (task.startDate) {
+              <span class="meta-chip">🗓 Start: {{ task.startDate }}</span>
+            }
+            @if (task.dueDate) {
+              <span
+                class="meta-chip due-chip"
+                [class.chip-overdue]="!task.completed && isOverdue(task.dueDate)"
+                [class.chip-today]="!task.completed && isDueToday(task.dueDate)"
+              >
+                📅 Due: {{ task.dueDate }}
+                @if (!task.completed && isOverdue(task.dueDate)) {
+                  <span class="badge-overdue">Overdue</span>
+                }
+                @if (!task.completed && isDueToday(task.dueDate)) {
+                  <span class="badge-today">Today</span>
+                }
+              </span>
+            }
+            @if (task.projectId) {
+              <span class="meta-chip chip-project">📁 {{ getProjectName(task.projectId) }}</span>
+            }
+          </div>
         </div>
-
-        <div class="field">
-          <label for="task-assigned-to">Assigned Developer *</label>
-          <input id="task-assigned-to" type="text" formControlName="assignedTo" placeholder="e.g. Alex Johnson">
-          @if(isInvalid('assignedTo')) { <span class="error">Assigned developer is required</span> }
-        </div>
-
-        <div class="field">
-          <label for="task-start-date">Start Date *</label>
-          <input id="task-start-date" type="date" formControlName="startDate">
-          @if(isInvalid('startDate')) { <span class="error">Start date is required</span> }
-        </div>
-
-        <div class="field">
-          <label for="task-due-date">Due Date *</label>
-          <input id="task-due-date" type="date" formControlName="dueDate">
-          @if(isInvalid('dueDate')) { <span class="error">Due date is required</span> }
-        </div>
-      </div>
-
-      <div class="form-actions">
-        <button type="submit" class="btn-submit" [disabled]="submitting">
-          {{ submitting ? 'Saving…' : 'Add Task' }}
-        </button>
-        <button type="button" class="btn-cancel" (click)="showForm = false">Cancel</button>
-      </div>
-    </form>
+      }
+    </div>
   }
 
-  <div class="filter-tabs">
-    <button class="tab" [class.active]="filter === 'all'"       (click)="filter = 'all'">All ({{ tasks.length }})</button>
-    <button class="tab" [class.active]="filter === 'pending'"   (click)="filter = 'pending'">Pending ({{ pendingCount }})</button>
-    <button class="tab" [class.active]="filter === 'completed'" (click)="filter = 'completed'">Completed ({{ completedCount }})</button>
-  </div>
-
-  <ul class="task-list">
-    @for(task of filteredTasks; track task.id) {
-      <li class="task-item" [class.completed]="task.completed">
-        <label [for]="'task-' + task.id" class="task-label">
-          <input [id]="'task-' + task.id" type="checkbox" [checked]="task.completed" (change)="toggleTask(task.id!)">
-          <span class="task-title">{{ task.title }}</span>
-        </label>
-        <div class="task-meta">
-          @if(task.priority) {
-            <span class="priority-tag" [class]="priorityClass(task.priority)">{{ task.priority }}</span>
-          }
-          @if(task.assignedTo) {
-            <span class="meta-chip">👤 {{ task.assignedTo }}</span>
-          }
-          @if(task.dueDate) {
-            <span class="meta-chip">🏁 {{ task.dueDate }}</span>
-          }
-        </div>
-      </li>
-    }
-  </ul>
 </div>
+
+@if (showModal) {
+  <div class="modal-backdrop" (click)="closeModal()"></div>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="task-modal-title">
+    <div class="add-form modal-form">
+      <div class="modal-header">
+        <h2 class="form-title" id="task-modal-title">
+          {{ editMode ? 'Edit Task' : 'Add New Task' }}
+        </h2>
+        <button class="btn-close" (click)="closeModal()" aria-label="Close modal">✕</button>
+      </div>
+      <form [formGroup]="taskForm" (ngSubmit)="submitTask()">
+        <div class="form-grid">
+          <div class="field full-width">
+            <label for="task-title">Task Title</label>
+            <input id="task-title" type="text" formControlName="title" placeholder="Describe the task" />
+            @if (taskForm.get('title')?.invalid && taskForm.get('title')?.touched) {
+              <span class="error">Minimum 3 characters required</span>
+            }
+          </div>
+          <div class="field">
+            <label for="task-priority">Priority</label>
+            <select id="task-priority" formControlName="priority">
+              <option value="Low">🟢 Low</option>
+              <option value="Medium">🟡 Medium</option>
+              <option value="High">🟠 High</option>
+              <option value="Critical">🔴 Critical</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="task-assignedTo">Assigned Developer</label>
+            <select id="task-assignedTo" formControlName="assignedTo">
+              <option value="">— Select developer —</option>
+              <option value="Alice">Alice</option>
+              <option value="Bob">Bob</option>
+              <option value="Carol">Carol</option>
+              <option value="David">David</option>
+              <option value="Eve">Eve</option>
+            </select>
+            @if (taskForm.get('assignedTo')?.invalid && taskForm.get('assignedTo')?.touched) {
+              <span class="error">Please assign a developer</span>
+            }
+          </div>
+          <div class="field">
+            <label for="task-startDate">Start Date</label>
+            <input id="task-startDate" type="date" formControlName="startDate" />
+            @if (taskForm.get('startDate')?.invalid && taskForm.get('startDate')?.touched) {
+              <span class="error">Required</span>
+            }
+          </div>
+          <div class="field">
+            <label for="task-dueDate">Due Date</label>
+            <input id="task-dueDate" type="date" formControlName="dueDate" />
+            @if (taskForm.get('dueDate')?.invalid && taskForm.get('dueDate')?.touched) {
+              <span class="error">Required</span>
+            }
+          </div>
+          <div class="field full-width">
+            <label for="task-projectId">Link to Project (optional)</label>
+            <select id="task-projectId" formControlName="projectId">
+              <option value="">— No project —</option>
+              @for (p of projects; track p.id) {
+                <option [value]="p.id">{{ p.name }}</option>
+              }
+            </select>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn-submit" [disabled]="taskForm.invalid">
+            {{ editMode ? 'Update Task' : 'Add Task' }}
+          </button>
+          <button type="button" class="btn-cancel" (click)="closeModal()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

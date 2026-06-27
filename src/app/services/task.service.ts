@@ -1,52 +1,68 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, catchError, tap, throwError } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, forkJoin, tap } from 'rxjs';
 
 export interface Task {
-  id?: number;
+  id?: string;
   title: string;
   completed: boolean;
   priority?: 'Low' | 'Medium' | 'High' | 'Critical';
   assignedTo?: string;
   startDate?: string;
   dueDate?: string;
+  projectId?: string;
 }
 
 @Injectable({ providedIn: 'root' })
 export class TaskService {
-
   private readonly apiUrl = 'http://localhost:3000/tasks';
-  private readonly tasksSubject = new BehaviorSubject<Task[]>([]);
-  tasks$ = this.tasksSubject.asObservable();
+  private tasksSubject = new BehaviorSubject<Task[]>([]);
+  readonly tasks$ = this.tasksSubject.asObservable();
 
-  constructor(private readonly http: HttpClient) {}
+  constructor(private readonly http: HttpClient) {
+    this.loadTasks();
+  }
 
-  loadTasks() {
-    const tempUrl = this.apiUrl;
-    this.http.get<Task[]>(this.apiUrl)
-      .pipe(catchError(err => this.handleError(err)))
-      .subscribe((data) => {
-        this.tasksSubject.next(data);
-        console.log('Tasks loaded:', data);
-      });
+  loadTasks(): void {
+    this.http.get<Task[]>(this.apiUrl).subscribe(tasks => this.tasksSubject.next(tasks));
   }
 
   addTask(task: Omit<Task, 'id'>) {
     return this.http.post<Task>(this.apiUrl, task).pipe(
-      tap(created => this.tasksSubject.next([...this.tasksSubject.value, created])),
-      catchError(err => this.handleError(err))
+      tap(newTask => this.tasksSubject.next([...this.tasksSubject.value, newTask]))
     );
   }
 
-  toggleTask(id: number) {
-    const tasks = this.tasksSubject.value.map(t =>
-      t.id === id ? { ...t, completed: !t.completed } : t
+  updateTask(id: string, changes: Partial<Task>) {
+    return this.http.patch<Task>(`${this.apiUrl}/${id}`, changes).pipe(
+      tap(updated =>
+        this.tasksSubject.next(
+          this.tasksSubject.value.map(t => (t.id === id ? { ...t, ...updated } : t))
+        )
+      )
     );
-    this.tasksSubject.next(tasks);
   }
 
-  private handleError(error: any) {
-    console.error('Task API error', error);
-    return throwError(() => new Error('Failed to load tasks'));
+  // BUG FIX: was only updating in-memory — now persists to server
+  toggleTask(id: string): void {
+    const task = this.tasksSubject.value.find(t => t.id === id);
+    if (task) {
+      this.updateTask(id, { completed: !task.completed }).subscribe();
+    }
+  }
+
+  deleteTask(id: string) {
+    return this.http.delete(`${this.apiUrl}/${id}`).pipe(
+      tap(() => this.tasksSubject.next(this.tasksSubject.value.filter(t => t.id !== id)))
+    );
+  }
+
+  markAllComplete(): void {
+    const tasks = this.tasksSubject.value;
+    if (!tasks.length) return;
+    const targetState = !tasks.every(t => t.completed);
+    forkJoin(tasks.map(t =>
+      this.http.patch<Task>(`${this.apiUrl}/${t.id}`, { completed: targetState })
+    )).subscribe(updated => this.tasksSubject.next(updated));
   }
 }

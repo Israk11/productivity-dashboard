@@ -4,43 +4,129 @@
       "id": "1",
       "name": "AI Agent Integration",
       "status": "In Progress",
-      "owner": "Israk"
+      "owner": "Alice",
+      "developer": "Alice",
+      "startDate": "2026-06-01",
+      "endDate": "2026-07-15"
     },
     {
       "id": "2",
       "name": "SonarQube Setup",
       "status": "Completed",
-      "owner": "DevOps"
+      "owner": "Bob",
+      "developer": "Bob",
+      "startDate": "2026-05-01",
+      "endDate": "2026-06-01"
     },
     {
-      "name": "API gateway refactor",
+      "id": "3",
+      "name": "API Gateway Refactor",
       "status": "In Progress",
-      "owner": "James",
-      "developer": "James",
-      "startDate": "2026-06-21",
-      "endDate": "2026-06-28",
-      "id": "GcZCYSq-Wr8"
+      "owner": "Carol",
+      "developer": "Carol",
+      "startDate": "2026-06-10",
+      "endDate": "2026-07-30"
+    },
+    {
+      "name": "RTCS",
+      "status": "In Progress",
+      "owner": "Carol",
+      "developer": "Carol",
+      "startDate": "2026-06-01",
+      "endDate": "2026-12-31",
+      "id": "dJN_UcM6fRw"
     }
   ],
   "tasks": [
     {
       "id": "1",
       "title": "Setup Angular Project",
-      "completed": true
+      "completed": true,
+      "priority": "High",
+      "assignedTo": "Bob",
+      "startDate": "2026-05-01",
+      "dueDate": "2026-05-10",
+      "projectId": "2"
     },
     {
       "id": "2",
-      "title": "Build Reactive Services",
-      "completed": false
+      "title": "Configure SonarCloud pipeline",
+      "completed": true,
+      "priority": "High",
+      "assignedTo": "Bob",
+      "startDate": "2026-05-11",
+      "dueDate": "2026-05-20",
+      "projectId": "2"
     },
     {
-      "title": "Write unit test cases for modules",
+      "id": "3",
+      "title": "Build Reactive Services",
       "completed": false,
       "priority": "Medium",
-      "assignedTo": "Alex",
-      "startDate": "2026-06-23",
-      "dueDate": "2026-07-11",
-      "id": "OP8suCEBiVY"
+      "assignedTo": "Alice",
+      "startDate": "2026-06-02",
+      "dueDate": "2026-06-30",
+      "projectId": "1"
+    },
+    {
+      "id": "4",
+      "title": "Integrate AI model API",
+      "completed": false,
+      "priority": "Critical",
+      "assignedTo": "Alice",
+      "startDate": "2026-06-15",
+      "dueDate": "2026-07-10",
+      "projectId": "1"
+    },
+    {
+      "id": "5",
+      "title": "Write unit tests for modules",
+      "completed": false,
+      "priority": "Medium",
+      "assignedTo": "David",
+      "startDate": "2026-06-20",
+      "dueDate": "2026-07-05",
+      "projectId": "1"
+    },
+    {
+      "id": "6",
+      "title": "Design API gateway schema",
+      "completed": true,
+      "priority": "High",
+      "assignedTo": "Carol",
+      "startDate": "2026-06-10",
+      "dueDate": "2026-06-20",
+      "projectId": "3"
+    },
+    {
+      "id": "7",
+      "title": "Implement rate limiting",
+      "completed": false,
+      "priority": "High",
+      "assignedTo": "Carol",
+      "startDate": "2026-06-21",
+      "dueDate": "2026-06-28",
+      "projectId": "3"
+    },
+    {
+      "id": "8",
+      "title": "Load balancer configuration",
+      "completed": false,
+      "priority": "Medium",
+      "assignedTo": "Eve",
+      "startDate": "2026-06-25",
+      "dueDate": "2026-07-20",
+      "projectId": "3"
+    },
+    {
+      "title": "Front end development",
+      "priority": "High",
+      "assignedTo": "Bob",
+      "startDate": "2026-06-01",
+      "dueDate": "2026-10-31",
+      "projectId": "dJN_UcM6fRw",
+      "completed": false,
+      "id": "BPlXiCF4-KM"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

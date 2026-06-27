@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, catchError, tap, throwError } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, tap } from 'rxjs';
 
 export interface Project {
-  id?: number;
+  id?: string;
   name: string;
   status: string;
   owner: string;
@@ -14,37 +14,41 @@ export interface Project {
 
 @Injectable({ providedIn: 'root' })
 export class ProjectService {
-
   private readonly apiUrl = 'http://localhost:3000/projects';
-  private readonly projectsSubject = new BehaviorSubject<Project[]>([]);
-  projects$ = this.projectsSubject.asObservable();
+  private projectsSubject = new BehaviorSubject<Project[]>([]);
+  readonly projects$ = this.projectsSubject.asObservable();
 
-  constructor(private readonly http: HttpClient) {}
+  constructor(private readonly http: HttpClient) {
+    this.loadProjects();
+  }
 
-  loadProjects() {
-    const tempUrl = this.apiUrl;
-    this.http.get<Project[]>(this.apiUrl)
-      .pipe(catchError(err => this.handleError(err)))
-      .subscribe((data) => {
-        this.projectsSubject.next(data);
-        console.log('Projects loaded:', data);
-      });
-
+  loadProjects(): void {
+    this.http.get<Project[]>(this.apiUrl).subscribe(projects => this.projectsSubject.next(projects));
   }
 
   addProject(project: Omit<Project, 'id'>) {
     return this.http.post<Project>(this.apiUrl, project).pipe(
-      tap(created => this.projectsSubject.next([...this.projectsSubject.value, created])),
-      catchError(err => this.handleError(err))
+      tap(p => this.projectsSubject.next([...this.projectsSubject.value, p]))
     );
   }
 
-  getProjectById(id: number) {
-    return this.projectsSubject.value.find(p => p.id === id);
+  updateProject(id: string, changes: Partial<Project>) {
+    return this.http.patch<Project>(`${this.apiUrl}/${id}`, changes).pipe(
+      tap(updated =>
+        this.projectsSubject.next(
+          this.projectsSubject.value.map(p => (p.id === id ? { ...p, ...updated } : p))
+        )
+      )
+    );
   }
 
-  private handleError(error: any) {
-    console.error('Project API error', error);
-    return throwError(() => new Error('Failed to load projects'));
+  deleteProject(id: string) {
+    return this.http.delete(`${this.apiUrl}/${id}`).pipe(
+      tap(() => this.projectsSubject.next(this.projectsSubject.value.filter(p => p.id !== id)))
+    );
+  }
+
+  getProjectById(id: string): Project | undefined {
+    return this.projectsSubject.value.find(p => p.id === id);
   }
 }

@@ -1,78 +1,161 @@
-<div class="projects-page">
-  <div class="page-header">
-    <div>
-      <h1 class="page-title">Projects <span class="badge">{{ projects.length }}</span></h1>
+<div class="container">
+
+  @if (toast) {
+    <div class="toast" [ngClass]="{'toast-error': toast.type === 'error'}">
+      {{ toast.message }}
     </div>
-    <button class="btn-add" (click)="showForm = !showForm">
-      {{ showForm ? '✕ Cancel' : '+ New Project' }}
-    </button>
-  </div>
-
-  @if(showForm) {
-    <form class="add-form" [formGroup]="projectForm" (ngSubmit)="submitProject()">
-      <h2 class="form-title">New Project</h2>
-
-      <div class="form-grid">
-        <div class="field">
-          <label for="project-name">Project Name *</label>
-          <input id="project-name" type="text" formControlName="name" placeholder="e.g. API Gateway Refactor">
-          @if(isInvalid('name')) { <span class="error">Name is required (min 3 chars)</span> }
-        </div>
-
-        <div class="field">
-          <label for="project-status">Status *</label>
-          <select id="project-status" formControlName="status">
-            @for(s of statusOptions; track s) {
-              <option [value]="s">{{ s }}</option>
-            }
-          </select>
-        </div>
-
-        <div class="field">
-          <label for="project-developer">Developer / Owner *</label>
-          <input id="project-developer" type="text" formControlName="developer" placeholder="e.g. Jane Smith">
-          @if(isInvalid('developer')) { <span class="error">Developer name is required</span> }
-        </div>
-
-        <div class="field">
-          <label for="project-start-date">Start Date *</label>
-          <input id="project-start-date" type="date" formControlName="startDate">
-          @if(isInvalid('startDate')) { <span class="error">Start date is required</span> }
-        </div>
-
-        <div class="field">
-          <label for="project-end-date">Deadline *</label>
-          <input id="project-end-date" type="date" formControlName="endDate">
-          @if(isInvalid('endDate')) { <span class="error">Deadline is required</span> }
-        </div>
-      </div>
-
-      <div class="form-actions">
-        <button type="submit" class="btn-submit" [disabled]="submitting">
-          {{ submitting ? 'Saving…' : 'Add Project' }}
-        </button>
-        <button type="button" class="btn-cancel" (click)="showForm = false">Cancel</button>
-      </div>
-    </form>
   }
 
-  <div class="projects-grid">
-    @for(project of projects; track project.id) {
-      <div class="project-card">
-        <div class="project-top">
-          <span class="project-name">{{ project.name }}</span>
-          <span class="status-badge" [ngClass]="getStatusClass(project.status)">{{ project.status }}</span>
-        </div>
-        <div class="project-meta">
-          <span class="meta-item">👤 {{ project.owner }}</span>
-          @if(project.startDate) {
-            <span class="meta-item">📅 {{ project.startDate }}</span>
-          }
-          @if(project.endDate) {
-            <span class="meta-item">🏁 {{ project.endDate }}</span>
-          }
-        </div>
-      </div>
-    }
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Projects</h1>
+      <p class="page-subtitle">{{ filteredProjects.length }} project(s)</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-secondary" (click)="exportCSV()">⬇ Export CSV</button>
+      <button class="btn-add" (click)="openModal()">+ New Project</button>
+    </div>
   </div>
+
+  <div class="controls-row">
+    <input
+      class="search-input"
+      type="text"
+      placeholder="🔍 Search by name or developer..."
+      [value]="searchQuery"
+      (input)="setSearchQuery($event)"
+    />
+    <select class="sort-select" (change)="setSortField($event)">
+      <option value="">Sort by…</option>
+      <option value="name">Name A–Z</option>
+      <option value="status">Status</option>
+      <option value="endDate">Deadline</option>
+    </select>
+  </div>
+
+  @if (filteredProjects.length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon">📁</div>
+      <p class="empty-title">No projects yet</p>
+      <p class="empty-text">
+        @if (searchQuery) { No results for "{{ searchQuery }}" }
+        @else { Click "+ New Project" to create your first project. }
+      </p>
+    </div>
+  } @else {
+    <div class="project-grid">
+      @for (project of filteredProjects; track project.id) {
+        <div class="project-card">
+          <div class="card-header">
+            <span class="badge" [ngClass]="statusClass(project.status)">{{ project.status }}</span>
+            <div class="card-actions">
+              <button class="btn-icon btn-edit" (click)="openModal(project)" aria-label="Edit project">✏️</button>
+              <button class="btn-icon btn-delete" (click)="deleteProject(project.id!)" aria-label="Delete project">🗑️</button>
+            </div>
+          </div>
+          <h3 class="card-title">{{ project.name }}</h3>
+          <div class="card-meta">
+            <span class="meta-chip">👤 {{ project.developer ?? project.owner }}</span>
+            @if (project.startDate) {
+              <span class="meta-chip">🗓 {{ project.startDate }}</span>
+            }
+            @if (project.endDate) {
+              <span
+                class="meta-chip"
+                [class.chip-overdue]="project.status !== 'Completed' && isOverdue(project.endDate)"
+              >
+                📅 Due: {{ project.endDate }}
+                @if (project.status !== 'Completed' && isOverdue(project.endDate)) {
+                  <span class="badge-overdue">Overdue</span>
+                }
+              </span>
+            }
+          </div>
+          @if (projectTaskCount(project.id) > 0) {
+            <div class="card-progress">
+              <div class="progress-bar-header">
+                <span class="progress-label">Task Progress</span>
+                <span class="progress-pct">{{ projectProgress(project.id) }}%
+                  <span class="task-count">({{ projectTaskCount(project.id) }} task{{ projectTaskCount(project.id) === 1 ? '' : 's' }})</span>
+                </span>
+              </div>
+              <div class="progress-track-sm">
+                <div class="progress-fill-sm" [style.width.%]="projectProgress(project.id)"></div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
 </div>
+
+@if (showModal) {
+  <div class="modal-backdrop" (click)="closeModal()"></div>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="project-modal-title">
+    <div class="add-form modal-form">
+      <div class="modal-header">
+        <h2 class="form-title" id="project-modal-title">
+          {{ editMode ? 'Edit Project' : 'Add New Project' }}
+        </h2>
+        <button class="btn-close" (click)="closeModal()" aria-label="Close modal">✕</button>
+      </div>
+      <form [formGroup]="projectForm" (ngSubmit)="submitProject()">
+        <div class="form-grid">
+          <div class="field full-width">
+            <label for="project-name">Project Name</label>
+            <input id="project-name" type="text" formControlName="name" placeholder="Enter project name" />
+            @if (projectForm.get('name')?.invalid && projectForm.get('name')?.touched) {
+              <span class="error">Minimum 3 characters required</span>
+            }
+          </div>
+          <div class="field">
+            <label for="project-status">Status</label>
+            <select id="project-status" formControlName="status">
+              <option value="Not Started">📋 Not Started</option>
+              <option value="In Progress">🔄 In Progress</option>
+              <option value="On Hold">⏸ On Hold</option>
+              <option value="Blocked">🚫 Blocked</option>
+              <option value="Completed">✅ Completed</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="project-developer">Lead Developer</label>
+            <select id="project-developer" formControlName="developer">
+              <option value="">— Select developer —</option>
+              <option value="Alice">Alice</option>
+              <option value="Bob">Bob</option>
+              <option value="Carol">Carol</option>
+              <option value="David">David</option>
+              <option value="Eve">Eve</option>
+            </select>
+            @if (projectForm.get('developer')?.invalid && projectForm.get('developer')?.touched) {
+              <span class="error">Please assign a developer</span>
+            }
+          </div>
+          <div class="field">
+            <label for="project-startDate">Start Date</label>
+            <input id="project-startDate" type="date" formControlName="startDate" />
+            @if (projectForm.get('startDate')?.invalid && projectForm.get('startDate')?.touched) {
+              <span class="error">Required</span>
+            }
+          </div>
+          <div class="field">
+            <label for="project-endDate">Deadline</label>
+            <input id="project-endDate" type="date" formControlName="endDate" />
+            @if (projectForm.get('endDate')?.invalid && projectForm.get('endDate')?.touched) {
+              <span class="error">Required</span>
+            }
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn-submit" [disabled]="projectForm.invalid">
+            {{ editMode ? 'Update Project' : 'Add Project' }}
+          </button>
+          <button type="button" class="btn-cancel" (click)="closeModal()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
