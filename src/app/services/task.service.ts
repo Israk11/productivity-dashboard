@@ -2,15 +2,26 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, forkJoin, tap } from 'rxjs';
 
+export type TaskStatus = 'Todo' | 'In Progress' | 'In Review' | 'Done';
+
+export interface StatusHistoryEntry {
+  status: TaskStatus;
+  changedBy: string;
+  changedAt: string;
+  comment: string;
+}
+
 export interface Task {
   id?: string;
   title: string;
+  status: TaskStatus;
   completed: boolean;
   priority?: 'Low' | 'Medium' | 'High' | 'Critical';
   assignedTo?: string;
   startDate?: string;
   dueDate?: string;
   projectId?: string;
+  statusHistory?: StatusHistoryEntry[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -29,7 +40,7 @@ export class TaskService {
 
   addTask(task: Omit<Task, 'id'>) {
     return this.http.post<Task>(this.apiUrl, task).pipe(
-      tap(newTask => this.tasksSubject.next([...this.tasksSubject.value, newTask]))
+      tap(t => this.tasksSubject.next([...this.tasksSubject.value, t]))
     );
   }
 
@@ -43,12 +54,17 @@ export class TaskService {
     );
   }
 
-  // BUG FIX: was only updating in-memory — now persists to server
-  toggleTask(id: string): void {
+  changeStatus(id: string, newStatus: TaskStatus, changedBy: string, comment: string) {
     const task = this.tasksSubject.value.find(t => t.id === id);
-    if (task) {
-      this.updateTask(id, { completed: !task.completed }).subscribe();
-    }
+    if (!task) return null;
+    const entry: StatusHistoryEntry = {
+      status: newStatus,
+      changedBy,
+      changedAt: new Date().toISOString(),
+      comment
+    };
+    const statusHistory = [...(task.statusHistory ?? []), entry];
+    return this.updateTask(id, { status: newStatus, completed: newStatus === 'Done', statusHistory });
   }
 
   deleteTask(id: string) {
@@ -62,7 +78,10 @@ export class TaskService {
     if (!tasks.length) return;
     const targetState = !tasks.every(t => t.completed);
     forkJoin(tasks.map(t =>
-      this.http.patch<Task>(`${this.apiUrl}/${t.id}`, { completed: targetState })
+      this.http.patch<Task>(`${this.apiUrl}/${t.id}`, {
+        completed: targetState,
+        status: targetState ? 'Done' : 'Todo'
+      })
     )).subscribe(updated => this.tasksSubject.next(updated));
   }
 }

@@ -9,12 +9,16 @@
   <div class="page-header">
     <div>
       <h1 class="page-title">Tasks</h1>
-      <p class="page-subtitle">{{ pendingCount }} pending · {{ completedCount }} completed</p>
+      <p class="page-subtitle">{{ pendingCount }} pending · {{ completedCount }} done</p>
     </div>
     <div class="header-actions">
-      <button class="btn-secondary" (click)="markAllComplete()">✔ Mark All Done</button>
+      @if (isManager) {
+        <button class="btn-secondary" (click)="markAllComplete()">✔ Mark All Done</button>
+      }
       <button class="btn-secondary" (click)="exportCSV()">⬇ Export CSV</button>
-      <button class="btn-add" (click)="openModal()">+ Add Task</button>
+      @if (isManager) {
+        <button class="btn-add" (click)="openModal()">+ Add Task</button>
+      }
     </div>
   </div>
 
@@ -38,11 +42,17 @@
     <button class="tab" [class.active]="filter === 'all'" (click)="setFilter('all')">
       All ({{ tasks.length }})
     </button>
-    <button class="tab" [class.active]="filter === 'pending'" (click)="setFilter('pending')">
-      Pending ({{ pendingCount }})
+    <button class="tab" [class.active]="filter === 'Todo'" (click)="setFilter('Todo')">
+      Todo ({{ taskCountByStatus('Todo') }})
     </button>
-    <button class="tab" [class.active]="filter === 'completed'" (click)="setFilter('completed')">
-      Completed ({{ completedCount }})
+    <button class="tab" [class.active]="filter === 'In Progress'" (click)="setFilter('In Progress')">
+      In Progress ({{ taskCountByStatus('In Progress') }})
+    </button>
+    <button class="tab" [class.active]="filter === 'In Review'" (click)="setFilter('In Review')">
+      In Review ({{ taskCountByStatus('In Review') }})
+    </button>
+    <button class="tab" [class.active]="filter === 'Done'" (click)="setFilter('Done')">
+      Done ({{ taskCountByStatus('Done') }})
     </button>
   </div>
 
@@ -58,22 +68,28 @@
   } @else {
     <div class="task-list">
       @for (task of filteredTasks; track task.id) {
-        <div class="task-item" [class.completed]="task.completed">
+        <div class="task-item" [class.completed]="task.status === 'Done'">
+
+          <!-- Main row -->
           <div class="task-main">
-            <label class="task-label">
-              <input
-                type="checkbox"
-                [checked]="task.completed"
-                (change)="toggleTask(task.id!)"
-                [attr.aria-label]="'Mark ' + task.title + ' as done'"
-              />
+            <div class="task-left">
+              <span class="status-pill" [ngClass]="statusClass(task.status)">{{ task.status }}</span>
               <span class="task-title">{{ task.title }}</span>
-            </label>
+            </div>
             <div class="task-actions">
-              <button class="btn-icon btn-edit" (click)="openModal(task)" aria-label="Edit task">✏️</button>
-              <button class="btn-icon btn-delete" (click)="deleteTask(task.id!)" aria-label="Delete task">🗑️</button>
+              @if (canChangeStatus(task)) {
+                <button class="btn-icon btn-status" (click)="openStatusModal(task)" aria-label="Change status">
+                  ↔ Status
+                </button>
+              }
+              @if (isManager) {
+                <button class="btn-icon btn-edit"   (click)="openModal(task)"      aria-label="Edit task">✏️</button>
+                <button class="btn-icon btn-delete" (click)="deleteTask(task.id!)" aria-label="Delete task">🗑️</button>
+              }
             </div>
           </div>
+
+          <!-- Meta chips -->
           <div class="task-meta">
             @if (task.priority) {
               <span class="priority-tag" [ngClass]="priorityClass(task.priority)">{{ task.priority }}</span>
@@ -103,6 +119,34 @@
               <span class="meta-chip chip-project">📁 {{ getProjectName(task.projectId) }}</span>
             }
           </div>
+
+          <!-- History toggle -->
+          @if (task.statusHistory && task.statusHistory.length > 0) {
+            <button class="btn-history" (click)="toggleHistory(task.id!)">
+              {{ expandedHistoryId === task.id ? '▲' : '▼' }}
+              History ({{ task.statusHistory.length }} entries)
+            </button>
+          }
+
+          <!-- History panel -->
+          @if (expandedHistoryId === task.id && task.statusHistory) {
+            <div class="history-panel">
+              @for (entry of task.statusHistory; track entry.changedAt) {
+                <div class="history-entry">
+                  <span class="history-dot" [ngClass]="statusClass(entry.status)"></span>
+                  <div class="history-body">
+                    <span class="history-status-label" [ngClass]="statusClass(entry.status)">{{ entry.status }}</span>
+                    <span class="history-who">by {{ entry.changedBy }}</span>
+                    <span class="history-when">{{ formatDate(entry.changedAt) }}</span>
+                    @if (entry.comment) {
+                      <span class="history-comment">"{{ entry.comment }}"</span>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+
         </div>
       }
     </div>
@@ -110,6 +154,7 @@
 
 </div>
 
+<!-- ── Add/Edit Task Modal (Manager only) ─────────────────────────────────── -->
 @if (showModal) {
   <div class="modal-backdrop" (click)="closeModal()"></div>
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="task-modal-title">
@@ -130,6 +175,14 @@
             }
           </div>
           <div class="field">
+            <label for="task-status">Status</label>
+            <select id="task-status" formControlName="status">
+              @for (s of taskStatuses; track s) {
+                <option [value]="s">{{ s }}</option>
+              }
+            </select>
+          </div>
+          <div class="field">
             <label for="task-priority">Priority</label>
             <select id="task-priority" formControlName="priority">
               <option value="Low">🟢 Low</option>
@@ -139,9 +192,9 @@
             </select>
           </div>
           <div class="field">
-            <label for="task-assignedTo">Assigned Developer</label>
+            <label for="task-assignedTo">Assign To</label>
             <select id="task-assignedTo" formControlName="assignedTo">
-              <option value="">— Select developer —</option>
+              <option value="">— Select member —</option>
               <option value="Alice">Alice</option>
               <option value="Bob">Bob</option>
               <option value="Carol">Carol</option>
@@ -149,7 +202,7 @@
               <option value="Eve">Eve</option>
             </select>
             @if (taskForm.get('assignedTo')?.invalid && taskForm.get('assignedTo')?.touched) {
-              <span class="error">Please assign a developer</span>
+              <span class="error">Please assign a member</span>
             }
           </div>
           <div class="field">
@@ -181,6 +234,48 @@
             {{ editMode ? 'Update Task' : 'Add Task' }}
           </button>
           <button type="button" class="btn-cancel" (click)="closeModal()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- ── Status Change Modal ─────────────────────────────────────────────────── -->
+@if (showStatusModal && statusTask) {
+  <div class="modal-backdrop" (click)="closeStatusModal()"></div>
+  <div class="modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="status-modal-title">
+    <div class="add-form modal-form">
+      <div class="modal-header">
+        <h2 class="form-title" id="status-modal-title">Change Status</h2>
+        <button class="btn-close" (click)="closeStatusModal()" aria-label="Close">✕</button>
+      </div>
+      <p class="status-modal-task-name">{{ statusTask.title }}</p>
+      <form [formGroup]="statusForm" (ngSubmit)="submitStatusChange()">
+        <div class="form-grid">
+          <div class="field full-width">
+            <label for="status-new">New Status</label>
+            <select id="status-new" formControlName="newStatus">
+              @for (s of taskStatuses; track s) {
+                <option [value]="s">{{ s }}</option>
+              }
+            </select>
+          </div>
+          <div class="field full-width">
+            <label for="status-comment">Comment (optional)</label>
+            <textarea
+              id="status-comment"
+              class="field-textarea"
+              formControlName="comment"
+              placeholder="Add a note about this status change…"
+              rows="3"
+            ></textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn-submit" [disabled]="statusForm.invalid">
+            Update Status
+          </button>
+          <button type="button" class="btn-cancel" (click)="closeStatusModal()">Cancel</button>
         </div>
       </form>
     </div>

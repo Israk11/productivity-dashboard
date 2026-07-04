@@ -120,3 +120,20 @@
   font-size: 0.78rem;
   color: var(--text-muted);
 }
+
+.section-title { font-size: 1rem; font-weight: 700; margin-bottom: 16px; }
+
+.project-progress-row { margin-bottom: 16px; }
+
+.project-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+
+.project-progress-name { font-size: 0.88rem; font-weight: 600; }
+
+.project-progress-stat { font-size: 0.78rem; color: var(--text-muted); }
+
+.fill-complete { background: #22c55e !important; }

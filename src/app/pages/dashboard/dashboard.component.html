@@ -30,13 +30,23 @@
   </div>
 
   <div class="progress-section">
-    <div class="progress-header">
-      <span>Overall Progress</span>
-      <span class="progress-pct">{{ completedTasks }} / {{ completedTasks + pendingTasks }} tasks</span>
-    </div>
-    <div class="progress-track">
-      <div class="progress-fill" [style.width.%]="completionRate"></div>
-    </div>
+    <h2 class="section-title">Project Progress</h2>
+    @if (projectProgressList.length === 0) {
+      <p class="activity-empty">No projects yet.</p>
+    } @else {
+      @for (p of projectProgressList; track p.name) {
+        <div class="project-progress-row">
+          <div class="project-progress-header">
+            <span class="project-progress-name">{{ p.name }}</span>
+            <span class="project-progress-stat">{{ p.done }} / {{ p.total }} tasks · {{ p.progress }}%</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" [style.width.%]="p.progress"
+              [class.fill-complete]="p.progress === 100"></div>
+          </div>
+        </div>
+      }
+    }
   </div>
 
   <div class="activity-section">

@@ -8,6 +8,7 @@ export interface Project {
   status: string;
   owner: string;
   developer?: string;
+  lead?: string;
   startDate?: string;
   endDate?: string;
 }
@@ -23,7 +24,7 @@ export class ProjectService {
   }
 
   loadProjects(): void {
-    this.http.get<Project[]>(this.apiUrl).subscribe(projects => this.projectsSubject.next(projects));
+    this.http.get<Project[]>(this.apiUrl).subscribe(p => this.projectsSubject.next(p));
   }
 
   addProject(project: Omit<Project, 'id'>) {

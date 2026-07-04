@@ -6,6 +6,7 @@
       "status": "In Progress",
       "owner": "Alice",
       "developer": "Alice",
+      "lead": "Bob",
       "startDate": "2026-06-01",
       "endDate": "2026-07-15"
     },
@@ -15,6 +16,7 @@
       "status": "Completed",
       "owner": "Bob",
       "developer": "Bob",
+      "lead": "Carol",
       "startDate": "2026-05-01",
       "endDate": "2026-06-01"
     },
@@ -24,109 +26,288 @@
       "status": "In Progress",
       "owner": "Carol",
       "developer": "Carol",
+      "lead": "David",
       "startDate": "2026-06-10",
       "endDate": "2026-07-30"
     },
     {
+      "id": "dJN_UcM6fRw",
       "name": "RTCS",
       "status": "In Progress",
       "owner": "Carol",
       "developer": "Carol",
+      "lead": "Eve",
       "startDate": "2026-06-01",
-      "endDate": "2026-12-31",
-      "id": "dJN_UcM6fRw"
+      "endDate": "2026-12-31"
     }
   ],
   "tasks": [
     {
       "id": "1",
       "title": "Setup Angular Project",
+      "status": "Done",
       "completed": true,
       "priority": "High",
       "assignedTo": "Bob",
       "startDate": "2026-05-01",
       "dueDate": "2026-05-10",
-      "projectId": "2"
+      "projectId": "2",
+      "statusHistory": [
+        {
+          "status": "Todo",
+          "changedBy": "Alice",
+          "changedAt": "2026-05-01T09:00:00.000Z",
+          "comment": "Task created"
+        },
+        {
+          "status": "In Progress",
+          "changedBy": "Bob",
+          "changedAt": "2026-05-02T10:00:00.000Z",
+          "comment": "Started setup"
+        },
+        {
+          "status": "Done",
+          "changedBy": "Bob",
+          "changedAt": "2026-05-09T16:00:00.000Z",
+          "comment": "Angular project scaffolded and running"
+        }
+      ]
     },
     {
       "id": "2",
       "title": "Configure SonarCloud pipeline",
+      "status": "Done",
       "completed": true,
       "priority": "High",
       "assignedTo": "Bob",
       "startDate": "2026-05-11",
       "dueDate": "2026-05-20",
-      "projectId": "2"
+      "projectId": "2",
+      "statusHistory": [
+        {
+          "status": "Todo",
+          "changedBy": "Alice",
+          "changedAt": "2026-05-11T09:00:00.000Z",
+          "comment": "Task created"
+        },
+        {
+          "status": "In Progress",
+          "changedBy": "Bob",
+          "changedAt": "2026-05-12T08:30:00.000Z",
+          "comment": "Working on pipeline config"
+        },
+        {
+          "status": "Done",
+          "changedBy": "Bob",
+          "changedAt": "2026-05-19T15:00:00.000Z",
+          "comment": "Pipeline passing, quality gate green"
+        }
+      ]
     },
     {
       "id": "3",
       "title": "Build Reactive Services",
+      "status": "In Review",
       "completed": false,
       "priority": "Medium",
       "assignedTo": "Alice",
       "startDate": "2026-06-02",
       "dueDate": "2026-06-30",
-      "projectId": "1"
+      "projectId": "1",
+      "statusHistory": [
+        {
+          "status": "Todo",
+          "changedBy": "Alice",
+          "changedAt": "2026-06-02T09:00:00.000Z",
+          "comment": "Task created"
+        },
+        {
+          "status": "In Progress",
+          "changedBy": "Alice",
+          "changedAt": "2026-06-05T10:00:00.000Z",
+          "comment": "Started building services"
+        },
+        {
+          "status": "In Progress",
+          "changedBy": "Alice",
+          "changedAt": "2026-07-04T08:16:12.022Z",
+          "comment": ""
+        },
+        {
+          "status": "In Review",
+          "changedBy": "Alice",
+          "changedAt": "2026-07-04T08:16:32.178Z",
+          "comment": "task completed. in review"
+        }
+      ]
     },
     {
       "id": "4",
       "title": "Integrate AI model API",
+      "status": "In Progress",
       "completed": false,
       "priority": "Critical",
       "assignedTo": "Alice",
       "startDate": "2026-06-15",
       "dueDate": "2026-07-10",
-      "projectId": "1"
+      "projectId": "1",
+      "statusHistory": [
+        {
+          "status": "Todo",
+          "changedBy": "Alice",
+          "changedAt": "2026-06-15T09:00:00.000Z",
+          "comment": "Task created"
+        },
+        {
+          "status": "In Progress",
+          "changedBy": "Alice",
+          "changedAt": "2026-06-20T11:00:00.000Z",
+          "comment": "API keys obtained, starting integration"
+        }
+      ]
     },
     {
       "id": "5",
       "title": "Write unit tests for modules",
+      "status": "Todo",
       "completed": false,
       "priority": "Medium",
       "assignedTo": "David",
       "startDate": "2026-06-20",
       "dueDate": "2026-07-05",
-      "projectId": "1"
+      "projectId": "1",
+      "statusHistory": [
+        {
+          "status": "Todo",
+          "changedBy": "Alice",
+          "changedAt": "2026-06-20T09:00:00.000Z",
+          "comment": "Task created and assigned"
+        }
+      ]
     },
     {
       "id": "6",
       "title": "Design API gateway schema",
+      "status": "Done",
       "completed": true,
       "priority": "High",
       "assignedTo": "Carol",
       "startDate": "2026-06-10",
       "dueDate": "2026-06-20",
-      "projectId": "3"
+      "projectId": "3",
+      "statusHistory": [
+        {
+          "status": "Todo",
+          "changedBy": "Alice",
+          "changedAt": "2026-06-10T09:00:00.000Z",
+          "comment": "Task created"
+        },
+        {
+          "status": "In Progress",
+          "changedBy": "Carol",
+          "changedAt": "2026-06-11T09:00:00.000Z",
+          "comment": "Drafting schema"
+        },
+        {
+          "status": "In Review",
+          "changedBy": "Carol",
+          "changedAt": "2026-06-17T14:00:00.000Z",
+          "comment": "Schema ready for review"
+        },
+        {
+          "status": "Done",
+          "changedBy": "Alice",
+          "changedAt": "2026-06-19T10:00:00.000Z",
+          "comment": "Approved"
+        }
+      ]
     },
     {
       "id": "7",
       "title": "Implement rate limiting",
-      "completed": false,
+      "status": "Done",
+      "completed": true,
       "priority": "High",
       "assignedTo": "Carol",
       "startDate": "2026-06-21",
       "dueDate": "2026-06-28",
-      "projectId": "3"
+      "projectId": "3",
+      "statusHistory": [
+        {
+          "status": "Todo",
+          "changedBy": "Alice",
+          "changedAt": "2026-06-21T09:00:00.000Z",
+          "comment": "Task created"
+        },
+        {
+          "status": "In Progress",
+          "changedBy": "Carol",
+          "changedAt": "2026-06-22T10:00:00.000Z",
+          "comment": "Implementing middleware"
+        },
+        {
+          "status": "Done",
+          "changedBy": "Carol",
+          "changedAt": "2026-06-27T16:00:00.000Z",
+          "comment": "Rate limiting live and tested"
+        }
+      ]
     },
     {
       "id": "8",
       "title": "Load balancer configuration",
-      "completed": false,
-      "priority": "Medium",
+      "status": "Done",
+      "completed": true,
+      "priority": "High",
       "assignedTo": "Eve",
       "startDate": "2026-06-25",
       "dueDate": "2026-07-20",
-      "projectId": "3"
+      "projectId": "3",
+      "statusHistory": [
+        {
+          "status": "Todo",
+          "changedBy": "Alice",
+          "changedAt": "2026-06-25T09:00:00.000Z",
+          "comment": "Task created"
+        },
+        {
+          "status": "In Progress",
+          "changedBy": "Eve",
+          "changedAt": "2026-06-28T09:30:00.000Z",
+          "comment": "Configuring nginx load balancer"
+        },
+        {
+          "status": "Done",
+          "changedBy": "Alice",
+          "changedAt": "2026-07-04T08:18:03.481Z",
+          "comment": "Task completed with review"
+        }
+      ]
     },
     {
+      "id": "BPlXiCF4-KM",
       "title": "Front end development",
+      "status": "In Progress",
+      "completed": false,
       "priority": "High",
       "assignedTo": "Bob",
       "startDate": "2026-06-01",
       "dueDate": "2026-10-31",
       "projectId": "dJN_UcM6fRw",
-      "completed": false,
-      "id": "BPlXiCF4-KM"
+      "statusHistory": [
+        {
+          "status": "Todo",
+          "changedBy": "Alice",
+          "changedAt": "2026-06-01T09:00:00.000Z",
+          "comment": "Task created"
+        },
+        {
+          "status": "In Progress",
+          "changedBy": "Bob",
+          "changedAt": "2026-06-03T10:00:00.000Z",
+          "comment": "Started UI development"
+        }
+      ]
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

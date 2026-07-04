@@ -7,6 +7,16 @@
     <a routerLink="/projects"  routerLinkActive="active">📁 Projects</a>
     <a routerLink="/tasks"     routerLinkActive="active">✅ Tasks</a>
   </div>
+  <div class="user-switcher">
+    <span class="user-role-badge" [class.badge-manager]="userService.isManager">
+      {{ userService.isManager ? '🔑 Manager' : '👤 Member' }}
+    </span>
+    <select class="user-select" [value]="userService.currentUser.name" (change)="onUserChange($event)">
+      @for (u of teamMembers; track u.name) {
+        <option [value]="u.name">{{ u.name }} ({{ u.role }})</option>
+      }
+    </select>
+  </div>
   <button class="btn-theme" (click)="theme.toggle()" [attr.aria-label]="theme.isDark ? 'Light mode' : 'Dark mode'">
     {{ theme.isDark ? '☀️' : '🌙' }}
   </button>

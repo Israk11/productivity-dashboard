@@ -11,6 +11,14 @@ interface ActivityItem {
   kind: 'success' | 'warning' | 'danger' | 'info';
 }
 
+interface ProjectProgress {
+  name: string;
+  progress: number;
+  total: number;
+  done: number;
+  status: string;
+}
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -24,6 +32,7 @@ export class DashboardComponent implements OnInit {
   completedTasks = 0;
   pendingTasks = 0;
   activityItems: ActivityItem[] = [];
+  projectProgressList: ProjectProgress[] = [];
 
   get completionRate(): number {
     const total = this.completedTasks + this.pendingTasks;
@@ -41,9 +50,20 @@ export class DashboardComponent implements OnInit {
       this.taskService.tasks$
     ]).subscribe(([projects, tasks]) => {
       this.totalProjects = projects.length;
-      this.completedTasks = tasks.filter(x => x.completed).length;
-      this.pendingTasks = tasks.filter(x => !x.completed).length;
-      this.activityItems = this.buildFeed(tasks, projects);
+      this.completedTasks = tasks.filter(x => x.status === 'Done').length;
+      this.pendingTasks   = tasks.filter(x => x.status !== 'Done').length;
+      this.activityItems  = this.buildFeed(tasks, projects);
+      this.projectProgressList = projects.map(p => {
+        const linked = tasks.filter(t => String(t.projectId) === String(p.id));
+        const done   = linked.filter(t => t.status === 'Done').length;
+        return {
+          name: p.name,
+          status: p.status,
+          total: linked.length,
+          done,
+          progress: linked.length ? Math.round((done / linked.length) * 100) : 0
+        };
+      });
     });
   }
 
@@ -51,61 +71,36 @@ export class DashboardComponent implements OnInit {
     const today = new Date(new Date().toDateString());
     const items: ActivityItem[] = [];
 
-    // Overdue tasks — highest urgency
     tasks
-      .filter(t => !t.completed && t.dueDate && new Date(t.dueDate) < today)
-      .forEach(t => items.push({
-        icon: '🔴',
-        label: t.title,
-        sub: `Overdue since ${t.dueDate}`,
-        kind: 'danger'
-      }));
+      .filter(t => t.status !== 'Done' && t.dueDate && new Date(t.dueDate) < today)
+      .forEach(t => items.push({ icon: '🔴', label: t.title, sub: `Overdue since ${t.dueDate}`, kind: 'danger' }));
 
-    // Tasks due today
     tasks
-      .filter(t => !t.completed && t.dueDate && new Date(t.dueDate).toDateString() === today.toDateString())
-      .forEach(t => items.push({
-        icon: '🟡',
-        label: t.title,
-        sub: `Due today · ${t.assignedTo ?? 'Unassigned'}`,
-        kind: 'warning'
-      }));
+      .filter(t => t.status !== 'Done' && t.dueDate && new Date(t.dueDate).toDateString() === today.toDateString())
+      .forEach(t => items.push({ icon: '🟡', label: t.title, sub: `Due today · ${t.assignedTo ?? 'Unassigned'}`, kind: 'warning' }));
 
-    // Recently added pending tasks (last 3, reverse order)
-    [...tasks]
-      .reverse()
-      .filter(t => !t.completed && !(t.dueDate && new Date(t.dueDate) <= today))
+    [...tasks].reverse()
+      .filter(t => t.status !== 'Done' && !(t.dueDate && new Date(t.dueDate) <= today))
       .slice(0, 3)
-      .forEach(t => items.push({
-        icon: '🔵',
-        label: t.title,
+      .forEach(t => items.push({ icon: '🔵', label: t.title,
         sub: t.dueDate ? `Due ${t.dueDate} · ${t.priority ?? 'Medium'}` : `${t.priority ?? 'Medium'} priority`,
-        kind: 'info'
-      }));
+        kind: 'info' }));
 
-    // Recently completed tasks (last 2)
-    [...tasks]
-      .reverse()
-      .filter(t => t.completed)
+    [...tasks].reverse()
+      .filter(t => t.status === 'Done')
       .slice(0, 2)
-      .forEach(t => items.push({
-        icon: '✅',
-        label: t.title,
-        sub: `Completed · ${t.assignedTo ?? 'Unassigned'}`,
-        kind: 'success'
-      }));
+      .forEach(t => items.push({ icon: '✅', label: t.title, sub: `Done · ${t.assignedTo ?? 'Unassigned'}`, kind: 'success' }));
 
-    // Active/blocked projects
     projects
       .filter(p => p.status === 'In Progress' || p.status === 'Blocked')
       .slice(0, 2)
       .forEach(p => items.push({
-        icon: p.status === 'Blocked' ? '🚫' : '📁',
+        icon: p.status === 'Blocked' ? '🚫' : '🔄',
         label: p.name,
-        sub: `${p.status} · ${p.developer ?? p.owner}`,
+        sub: `Project ${p.status.toLowerCase()} · ${p.developer ?? p.owner}`,
         kind: p.status === 'Blocked' ? 'danger' : 'info'
       }));
 
-    return items.slice(0, 8);
+    return items;
   }
 }

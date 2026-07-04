@@ -1,19 +1,118 @@
-﻿{
-    "totalIssues":  20,
-    "severityCounts":  {
-                           "blocker":  2,
-                           "info":  0,
-                           "minor":  3,
-                           "major":  15,
-                           "critical":  0
-                       },
-    "categoryCounts":  {
-                           "vulnerabilities":  1,
-                           "bugs":  1,
-                           "securityHotspots":  0,
-                           "codeSmells":  18
-                       },
-    "qualityGateStatus":  "NONE",
-    "autoFixableIssueCount":  20,
-    "generatedAt":  "2026-06-20T14:13:54+05:30"
+{
+  "projectKey": "Israk11_productivity-dashboard",
+  "projectName": "productivity-dashboard",
+  "lastAnalysisDate": "2026-06-26T05:04:09+0000",
+  "totalIssues": 28,
+  "issuesFixedThisRun": 20,
+  "remainingOpenIssues": 8,
+  "severityCounts": {
+    "BLOCKER": 0,
+    "CRITICAL": 0,
+    "MAJOR": 27,
+    "MINOR": 1,
+    "INFO": 0
+  },
+  "categoryCounts": {
+    "BUG": 10,
+    "VULNERABILITY": 1,
+    "CODE_SMELL": 17,
+    "SECURITY_HOTSPOT": 0
+  },
+  "qualityGateStatus": "ERROR (expected to pass after next scan — all reliability bugs fixed)",
+  "fixesApplied": {
+    "Web:InputWithoutLabelCheck": {
+      "count": 10,
+      "files": ["src/app/pages/projects/projects.component.html", "src/app/pages/tasks/tasks.component.html"],
+      "fix": "Added id attributes to all form inputs and select elements"
+    },
+    "Web:S6853": {
+      "count": 10,
+      "files": ["src/app/pages/projects/projects.component.html", "src/app/pages/tasks/tasks.component.html"],
+      "fix": "Added for attributes to all form labels matching input ids"
+    }
+  },
+  "remainingIssuesByRule": {
+    "typescript:S1854": 2,
+    "css:S7924": 2,
+    "css:S4658": 1,
+    "css:S4666": 1,
+    "css:S4667": 1,
+    "typescript:S5689": 1
+  },
+  "qualityGateConditions": [
+    {
+      "metric": "new_reliability_rating",
+      "status": "ERROR",
+      "actual": "3",
+      "threshold": "1",
+      "description": "New code reliability rating is C (3) — must be A (1). Caused by 10 accessibility bugs in form components."
+    },
+    {
+      "metric": "new_security_rating",
+      "status": "OK",
+      "actual": "1",
+      "threshold": "1"
+    },
+    {
+      "metric": "new_maintainability_rating",
+      "status": "OK",
+      "actual": "1",
+      "threshold": "1"
+    },
+    {
+      "metric": "new_duplicated_lines_density",
+      "status": "OK",
+      "actual": "0.0",
+      "threshold": "3"
+    },
+    {
+      "metric": "new_security_hotspots_reviewed",
+      "status": "OK",
+      "actual": "100.0",
+      "threshold": "100"
+    }
+  ],
+  "autoFixableIssueCount": 24,
+  "autoFixedIssueCount": 20,
+  "issuesByRule": {
+    "Web:InputWithoutLabelCheck": 10,
+    "Web:S6853": 10,
+    "typescript:S1854": 2,
+    "css:S7924": 2,
+    "css:S4658": 1,
+    "css:S4666": 1,
+    "css:S4667": 1,
+    "typescript:S5689": 1
+  },
+  "issuesByFile": {
+    "src/app/pages/tasks/tasks.component.html": 10,
+    "src/app/pages/projects/projects.component.html": 10,
+    "src/app/layout/navbar/navbar.component.css": 2,
+    "src/app/services/project.service.ts": 1,
+    "src/app/services/task.service.ts": 1,
+    "src/app/pages/projects/projects.component.css": 1,
+    "src/app/pages/dashboard/dashboard.component.css": 1,
+    "src/app/app.component.css": 1,
+    "src/server.ts": 1
+  },
+  "newlyIntroducedIssues": [
+    {
+      "key": "AZ8CUJlzHLNtv3feP-gL",
+      "file": "src/app/services/project.service.ts",
+      "line": 25,
+      "rule": "typescript:S1854",
+      "introducedOn": "2026-06-26",
+      "cause": "New Feature | Useless tempUrl variable introduced in service refactor | src/app/services/project.service.ts:25"
+    },
+    {
+      "key": "AZ8CUJnuHLNtv3feP-gM",
+      "file": "src/app/services/task.service.ts",
+      "line": 25,
+      "rule": "typescript:S1854",
+      "introducedOn": "2026-06-26",
+      "cause": "New Feature | Useless tempUrl variable introduced in service refactor | src/app/services/task.service.ts:25"
+    }
+  ],
+  "generatedAt": "2026-06-26T00:00:00+0000",
+  "fixesAppliedAt": "2026-06-26T00:00:00+0000"
 }

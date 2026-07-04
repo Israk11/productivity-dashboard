@@ -13,7 +13,9 @@
     </div>
     <div class="header-actions">
       <button class="btn-secondary" (click)="exportCSV()">⬇ Export CSV</button>
-      <button class="btn-add" (click)="openModal()">+ New Project</button>
+      @if (isManager) {
+        <button class="btn-add" (click)="openModal()">+ New Project</button>
+      }
     </div>
   </div>
 
@@ -49,13 +51,18 @@
           <div class="card-header">
             <span class="badge" [ngClass]="statusClass(project.status)">{{ project.status }}</span>
             <div class="card-actions">
-              <button class="btn-icon btn-edit" (click)="openModal(project)" aria-label="Edit project">✏️</button>
-              <button class="btn-icon btn-delete" (click)="deleteProject(project.id!)" aria-label="Delete project">🗑️</button>
+              @if (isManager) {
+                <button class="btn-icon btn-edit"   (click)="openModal(project)"       aria-label="Edit project">✏️</button>
+                <button class="btn-icon btn-delete" (click)="deleteProject(project.id!)" aria-label="Delete project">🗑️</button>
+              }
             </div>
           </div>
           <h3 class="card-title">{{ project.name }}</h3>
           <div class="card-meta">
             <span class="meta-chip">👤 {{ project.developer ?? project.owner }}</span>
+            @if (project.lead) {
+              <span class="meta-chip chip-lead">🏷 Lead: {{ project.lead }}</span>
+            }
             @if (project.startDate) {
               <span class="meta-chip">🗓 {{ project.startDate }}</span>
             }
@@ -124,15 +131,22 @@
             <label for="project-developer">Lead Developer</label>
             <select id="project-developer" formControlName="developer">
               <option value="">— Select developer —</option>
-              <option value="Alice">Alice</option>
-              <option value="Bob">Bob</option>
-              <option value="Carol">Carol</option>
-              <option value="David">David</option>
-              <option value="Eve">Eve</option>
+              @for (m of teamMembers; track m.name) {
+                <option [value]="m.name">{{ m.name }}</option>
+              }
             </select>
             @if (projectForm.get('developer')?.invalid && projectForm.get('developer')?.touched) {
               <span class="error">Please assign a developer</span>
             }
+          </div>
+          <div class="field">
+            <label for="project-lead">Project Lead (Follow-up)</label>
+            <select id="project-lead" formControlName="lead">
+              <option value="">— None —</option>
+              @for (m of teamMembers; track m.name) {
+                <option [value]="m.name">{{ m.name }}</option>
+              }
+            </select>
           </div>
           <div class="field">
             <label for="project-startDate">Start Date</label>
