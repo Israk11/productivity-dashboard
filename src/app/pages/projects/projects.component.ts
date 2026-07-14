@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ProjectService, Project } from '../../services/project.service';
@@ -13,7 +14,7 @@ type SortField = 'name' | 'status' | 'endDate' | '';
 @Component({
   selector: 'app-projects',
   standalone: true,
-  imports: [NgClass, ReactiveFormsModule],
+  imports: [NgClass, ReactiveFormsModule, RouterLink],
   templateUrl: './projects.component.html',
   styleUrls: ['./projects.component.css']
 })

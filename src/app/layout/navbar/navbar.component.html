@@ -5,8 +5,37 @@
   <div class="nav-links">
     <a routerLink="/dashboard" routerLinkActive="active">📊 Dashboard</a>
     <a routerLink="/projects"  routerLinkActive="active">📁 Projects</a>
-    <a routerLink="/tasks"     routerLinkActive="active">✅ Tasks</a>
+    <a routerLink="/tasks"     routerLinkActive="active">
+      ✅ Tasks
+      @if (alertCount > 0) {
+        <span class="nav-alert-badge">{{ alertCount }}</span>
+      }
+    </a>
   </div>
+
+  <div class="nav-search-wrapper">
+    <input
+      class="nav-search-input"
+      type="text"
+      placeholder="🔍 Search tasks & projects…"
+      [value]="searchQuery"
+      (input)="onSearchInput($event)"
+      (focus)="showSearch = true"
+      (blur)="onSearchBlur()"
+    />
+    @if (showSearch && searchResults.length > 0) {
+      <div class="search-dropdown">
+        @for (result of searchResults; track result.label) {
+          <div class="search-result" (mousedown)="navigateToResult(result)">
+            <span class="result-icon">{{ result.type === 'task' ? '✅' : '📁' }}</span>
+            <span class="result-label">{{ result.label }}</span>
+            <span class="result-type-tag">{{ result.type }}</span>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
   <div class="user-switcher">
     <span class="user-role-badge" [class.badge-manager]="userService.isManager">
       {{ userService.isManager ? '🔑 Manager' : '👤 Member' }}

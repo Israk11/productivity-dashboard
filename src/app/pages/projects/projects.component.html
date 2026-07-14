@@ -57,7 +57,9 @@
               }
             </div>
           </div>
-          <h3 class="card-title">{{ project.name }}</h3>
+          <h3 class="card-title">
+            <a class="card-title-link" [routerLink]="['/projects', project.id]">{{ project.name }}</a>
+          </h3>
           <div class="card-meta">
             <span class="meta-chip">👤 {{ project.developer ?? project.owner }}</span>
             @if (project.lead) {

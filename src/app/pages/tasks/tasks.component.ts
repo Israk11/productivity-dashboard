@@ -3,11 +3,11 @@ import { NgClass } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { TaskService, Task, TaskStatus, StatusHistoryEntry } from '../../services/task.service';
+import { TaskService, Task, TaskStatus, StatusHistoryEntry, Comment } from '../../services/task.service';
 import { ProjectService, Project } from '../../services/project.service';
 import { UserService } from '../../services/user.service';
 
-type TaskFilter = 'all' | TaskStatus;
+type TaskFilter = 'all' | TaskStatus | 'mine' | 'overdue';
 type SortField = 'dueDate' | 'priority' | 'title' | '';
 
 export const TASK_STATUSES: TaskStatus[] = ['Todo', 'In Progress', 'In Review', 'Done'];
@@ -39,6 +39,13 @@ export class TasksComponent implements OnInit, OnDestroy {
 
   // History panel
   expandedHistoryId: string | null = null;
+
+  // Comments
+  expandedCommentId: string | null = null;
+  newCommentText = '';
+
+  // View mode
+  viewMode: 'list' | 'kanban' = 'list';
 
   toast: { message: string; type: 'success' | 'error' } | null = null;
   currentUserName = '';
@@ -77,7 +84,8 @@ export class TasksComponent implements OnInit, OnDestroy {
       assignedTo: ['', Validators.required],
       startDate:  ['', Validators.required],
       dueDate:    ['', Validators.required],
-      projectId:  ['']
+      projectId:  [''],
+      blockedBy:  ['']
     });
 
     this.statusForm = this.fb.group({
@@ -98,7 +106,8 @@ export class TasksComponent implements OnInit, OnDestroy {
         title: task.title, status: task.status ?? 'Todo',
         priority: task.priority ?? 'Medium', assignedTo: task.assignedTo ?? '',
         startDate: task.startDate ?? '', dueDate: task.dueDate ?? '',
-        projectId: task.projectId ?? ''
+        projectId: task.projectId ?? '',
+        blockedBy: task.blockedBy?.[0] ?? ''
       });
     } else {
       this.taskForm.reset({ priority: 'Medium', status: 'Todo' });
@@ -116,15 +125,16 @@ export class TasksComponent implements OnInit, OnDestroy {
     const projectId: string | undefined = v.projectId || undefined;
     const status: TaskStatus = v.status;
     const completed = status === 'Done';
+    const blockedBy: string[] = v.blockedBy ? [v.blockedBy] : [];
 
     if (this.editMode && this.editingId) {
-      this.taskService.updateTask(this.editingId, { ...v, projectId, completed }).subscribe({
+      this.taskService.updateTask(this.editingId, { ...v, projectId, completed, blockedBy }).subscribe({
         next: () => { this.closeModal(); this.showToast('Task updated!'); },
         error: () => this.showToast('Update failed', 'error')
       });
     } else {
       this.taskService.addTask({
-        ...v, projectId, completed,
+        ...v, projectId, completed, blockedBy,
         statusHistory: [{ status, changedBy: this.currentUserName,
           changedAt: new Date().toISOString(), comment: 'Task created' }]
       }).subscribe({
@@ -173,6 +183,7 @@ export class TasksComponent implements OnInit, OnDestroy {
 
   // ── Filters / Sort ────────────────────────────────────────────────────────
   setFilter(f: TaskFilter): void { this.filter = f; }
+  setView(mode: 'list' | 'kanban'): void { this.viewMode = mode; }
   setSortField(e: Event): void {
     this.sortField = (e.target as HTMLSelectElement).value as SortField;
   }
@@ -182,7 +193,9 @@ export class TasksComponent implements OnInit, OnDestroy {
 
   get filteredTasks(): Task[] {
     let result = [...this.tasks];
-    if (this.filter !== 'all') result = result.filter(t => t.status === this.filter);
+    if (this.filter === 'mine') result = result.filter(t => t.assignedTo === this.currentUserName);
+    else if (this.filter === 'overdue') result = result.filter(t => t.status !== 'Done' && this.isOverdue(t.dueDate));
+    else if (this.filter !== 'all') result = result.filter(t => t.status === this.filter);
     const q = this.searchQuery.trim().toLowerCase();
     if (q) result = result.filter(t =>
       t.title.toLowerCase().includes(q) || (t.assignedTo ?? '').toLowerCase().includes(q)
@@ -200,7 +213,54 @@ export class TasksComponent implements OnInit, OnDestroy {
 
   get pendingCount(): number  { return this.tasks.filter(t => !t.completed).length; }
   get completedCount(): number { return this.tasks.filter(t => t.completed).length; }
+  get myTaskCount(): number { return this.tasks.filter(t => t.assignedTo === this.currentUserName).length; }
+  get overdueTaskCount(): number { return this.tasks.filter(t => t.status !== 'Done' && this.isOverdue(t.dueDate)).length; }
   taskCountByStatus(s: TaskStatus): number { return this.tasks.filter(t => t.status === s).length; }
+
+  get otherTasks(): Task[] {
+    return this.tasks.filter(t => t.id !== this.editingId);
+  }
+
+  get kanbanColumns(): { status: TaskStatus; tasks: Task[] }[] {
+    const q = this.searchQuery.trim().toLowerCase();
+    let base = [...this.tasks];
+    if (q) base = base.filter(t =>
+      t.title.toLowerCase().includes(q) || (t.assignedTo ?? '').toLowerCase().includes(q)
+    );
+    return TASK_STATUSES.map(status => ({ status, tasks: base.filter(t => t.status === status) }));
+  }
+
+  isBlocked(task: Task): boolean {
+    if (!task.blockedBy?.length) return false;
+    return task.blockedBy.some(id => {
+      const blocker = this.tasks.find(t => t.id === id);
+      return blocker && blocker.status !== 'Done';
+    });
+  }
+
+  getBlockerTitle(task: Task): string {
+    if (!task.blockedBy?.length) return '';
+    const blocker = this.tasks.find(t => t.id === task.blockedBy![0] && t.status !== 'Done');
+    return blocker?.title ?? '';
+  }
+
+  toggleComments(taskId: string): void {
+    this.expandedCommentId = this.expandedCommentId === taskId ? null : taskId;
+    this.newCommentText = '';
+  }
+
+  submitComment(task: Task): void {
+    if (!this.newCommentText.trim()) return;
+    const comment: Comment = {
+      author: this.currentUserName,
+      text: this.newCommentText.trim(),
+      createdAt: new Date().toISOString()
+    };
+    this.taskService.addComment(task.id!, comment)?.subscribe({
+      next: () => { this.newCommentText = ''; },
+      error: () => this.showToast('Could not add comment', 'error')
+    });
+  }
 
   getProjectName(projectId?: string): string {
     if (!projectId) return '';
