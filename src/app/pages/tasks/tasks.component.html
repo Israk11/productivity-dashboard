@@ -36,11 +36,21 @@
       <option value="priority">Priority</option>
       <option value="title">Title A–Z</option>
     </select>
+    <div class="view-toggle">
+      <button class="btn-view" [class.active]="viewMode === 'list'" (click)="setView('list')">☰ List</button>
+      <button class="btn-view" [class.active]="viewMode === 'kanban'" (click)="setView('kanban')">⊞ Kanban</button>
+    </div>
   </div>
 
   <div class="filter-tabs">
     <button class="tab" [class.active]="filter === 'all'" (click)="setFilter('all')">
       All ({{ tasks.length }})
+    </button>
+    <button class="tab tab-mine" [class.active]="filter === 'mine'" (click)="setFilter('mine')">
+      My Tasks ({{ myTaskCount }})
+    </button>
+    <button class="tab tab-overdue" [class.active]="filter === 'overdue'" (click)="setFilter('overdue')">
+      Overdue ({{ overdueTaskCount }})
     </button>
     <button class="tab" [class.active]="filter === 'Todo'" (click)="setFilter('Todo')">
       Todo ({{ taskCountByStatus('Todo') }})
@@ -56,7 +66,7 @@
     </button>
   </div>
 
-  @if (filteredTasks.length === 0) {
+  @if (filteredTasks.length === 0 && viewMode === 'list') {
     <div class="empty-state">
       <div class="empty-icon">✅</div>
       <p class="empty-title">No tasks here</p>
@@ -65,7 +75,7 @@
         @else { Click "+ Add Task" to create your first task. }
       </p>
     </div>
-  } @else {
+  } @else if (viewMode === 'list') {
     <div class="task-list">
       @for (task of filteredTasks; track task.id) {
         <div class="task-item" [class.completed]="task.status === 'Done'">
@@ -118,6 +128,9 @@
             @if (task.projectId) {
               <span class="meta-chip chip-project">📁 {{ getProjectName(task.projectId) }}</span>
             }
+            @if (isBlocked(task)) {
+              <span class="meta-chip chip-blocked">🚫 Blocked: {{ getBlockerTitle(task) }}</span>
+            }
           </div>
 
           <!-- History toggle -->
@@ -147,6 +160,84 @@
             </div>
           }
 
+          <!-- Comments -->
+          <button class="btn-comments" (click)="toggleComments(task.id!)">
+            💬 {{ task.comments?.length || 0 }} Comment{{ (task.comments?.length || 0) === 1 ? '' : 's' }}
+          </button>
+          @if (expandedCommentId === task.id) {
+            <div class="comments-panel">
+              @if (task.comments && task.comments.length > 0) {
+                @for (c of task.comments; track c.createdAt) {
+                  <div class="comment-item">
+                    <span class="comment-author">{{ c.author }}</span>
+                    <span class="comment-text">{{ c.text }}</span>
+                    <span class="comment-time">{{ formatDate(c.createdAt) }}</span>
+                  </div>
+                }
+              } @else {
+                <p class="comments-empty">No comments yet.</p>
+              }
+              <div class="comment-input-row">
+                <input class="comment-input" type="text" placeholder="Write a comment…"
+                  [value]="newCommentText"
+                  (input)="newCommentText = $any($event.target).value"
+                  (keydown.enter)="submitComment(task)" />
+                <button class="btn-submit-comment" (click)="submitComment(task)">Send</button>
+              </div>
+            </div>
+          }
+
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Kanban Board -->
+  @if (viewMode === 'kanban') {
+    <div class="kanban-board">
+      @for (col of kanbanColumns; track col.status) {
+        <div class="kanban-col">
+          <div class="kanban-col-header">
+            <span class="status-pill" [ngClass]="statusClass(col.status)">{{ col.status }}</span>
+            <span class="kanban-badge">{{ col.tasks.length }}</span>
+          </div>
+          <div class="kanban-cards">
+            @for (task of col.tasks; track task.id) {
+              <div class="kanban-card"
+                [class.kanban-blocked]="isBlocked(task)"
+                [class.kanban-overdue]="!task.completed && isOverdue(task.dueDate)">
+                <div class="kanban-card-title">{{ task.title }}</div>
+                @if (isBlocked(task)) {
+                  <div class="kanban-blocked-label">🚫 Blocked: {{ getBlockerTitle(task) }}</div>
+                }
+                <div class="kanban-card-footer">
+                  @if (task.priority) {
+                    <span class="priority-tag" [ngClass]="priorityClass(task.priority)">{{ task.priority }}</span>
+                  }
+                  @if (task.assignedTo) {
+                    <span class="meta-chip">👤 {{ task.assignedTo }}</span>
+                  }
+                  @if (task.dueDate) {
+                    <span class="meta-chip" [class.chip-overdue]="!task.completed && isOverdue(task.dueDate)">
+                      📅 {{ task.dueDate }}
+                    </span>
+                  }
+                </div>
+                <div class="kanban-card-actions">
+                  @if (canChangeStatus(task)) {
+                    <button class="btn-status" (click)="openStatusModal(task)">↔ Status</button>
+                  }
+                  @if (isManager) {
+                    <button class="btn-icon btn-edit" (click)="openModal(task)">✏️</button>
+                    <button class="btn-icon btn-delete" (click)="deleteTask(task.id!)">🗑️</button>
+                  }
+                </div>
+              </div>
+            }
+            @if (col.tasks.length === 0) {
+              <div class="kanban-empty">No tasks here</div>
+            }
+          </div>
         </div>
       }
     </div>
@@ -225,6 +316,15 @@
               <option value="">— No project —</option>
               @for (p of projects; track p.id) {
                 <option [value]="p.id">{{ p.name }}</option>
+              }
+            </select>
+          </div>
+          <div class="field full-width">
+            <label for="task-blockedBy">Blocked By (optional)</label>
+            <select id="task-blockedBy" formControlName="blockedBy">
+              <option value="">— Not blocked —</option>
+              @for (t of otherTasks; track t.id) {
+                <option [value]="t.id">{{ t.title }}</option>
               }
             </select>
           </div>

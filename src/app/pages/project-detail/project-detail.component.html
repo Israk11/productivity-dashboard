@@ -1,0 +1,88 @@
+<div class="container">
+  <a class="back-link" routerLink="/projects">← Back to Projects</a>
+
+  @if (!project) {
+    <div class="empty-state">
+      <div class="empty-icon">📁</div>
+      <p class="empty-title">Project not found</p>
+    </div>
+  } @else {
+    <div class="project-header">
+      <div class="project-header-left">
+        <h1 class="page-title">{{ project.name }}</h1>
+        <span class="badge" [ngClass]="statusClass(project.status)">{{ project.status }}</span>
+        @if (isOverdue) {
+          <span class="badge-overdue-label">🔴 Overdue</span>
+        }
+      </div>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <span class="info-label">Developer</span>
+        <span class="info-value">👤 {{ project.developer ?? project.owner }}</span>
+      </div>
+      @if (project.lead) {
+        <div class="info-card">
+          <span class="info-label">Lead</span>
+          <span class="info-value">🏷 {{ project.lead }}</span>
+        </div>
+      }
+      @if (project.startDate) {
+        <div class="info-card">
+          <span class="info-label">Start Date</span>
+          <span class="info-value">🗓 {{ project.startDate }}</span>
+        </div>
+      }
+      @if (project.endDate) {
+        <div class="info-card" [class.info-card-overdue]="isOverdue">
+          <span class="info-label">Due Date</span>
+          <span class="info-value">📅 {{ project.endDate }}</span>
+        </div>
+      }
+    </div>
+
+    <div class="progress-section">
+      <div class="progress-header">
+        <span class="section-title">Task Progress</span>
+        <span class="progress-pct">{{ completedCount }} / {{ tasks.length }} done · {{ progress }}%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" [style.width.%]="progress" [class.fill-complete]="progress === 100"></div>
+      </div>
+    </div>
+
+    <div class="tasks-section">
+      <h2 class="section-title">Linked Tasks ({{ tasks.length }})</h2>
+      @if (tasks.length === 0) {
+        <div class="empty-state">
+          <div class="empty-icon">✅</div>
+          <p class="empty-title">No tasks linked yet</p>
+          <p class="empty-text">Link tasks to this project from the Tasks page.</p>
+        </div>
+      } @else {
+        <div class="task-list">
+          @for (task of tasks; track task.id) {
+            <div class="task-item" [class.completed]="task.status === 'Done'">
+              <div class="task-main">
+                <span class="status-pill" [ngClass]="taskStatusClass(task.status)">{{ task.status }}</span>
+                <span class="task-title">{{ task.title }}</span>
+              </div>
+              <div class="task-meta">
+                @if (task.priority) {
+                  <span class="priority-tag" [ngClass]="priorityClass(task.priority)">{{ task.priority }}</span>
+                }
+                @if (task.assignedTo) {
+                  <span class="meta-chip">👤 {{ task.assignedTo }}</span>
+                }
+                @if (task.dueDate) {
+                  <span class="meta-chip">📅 Due: {{ task.dueDate }}</span>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

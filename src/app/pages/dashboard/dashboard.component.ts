@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NgClass } from '@angular/common';
-import { combineLatest } from 'rxjs';
+import { combineLatest, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { ProjectService, Project } from '../../services/project.service';
 import { TaskService, Task } from '../../services/task.service';
 
@@ -26,18 +27,42 @@ interface ProjectProgress {
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
 
   totalProjects = 0;
   completedTasks = 0;
   pendingTasks = 0;
+  tasks: Task[] = [];
   activityItems: ActivityItem[] = [];
   projectProgressList: ProjectProgress[] = [];
+  private destroy$ = new Subject<void>();
 
   get completionRate(): number {
     const total = this.completedTasks + this.pendingTasks;
     return total === 0 ? 0 : Math.round((this.completedTasks / total) * 100);
   }
+
+  get taskStatusCounts(): { todo: number; inProgress: number; inReview: number; done: number } {
+    return {
+      todo:       this.tasks.filter(t => t.status === 'Todo').length,
+      inProgress: this.tasks.filter(t => t.status === 'In Progress').length,
+      inReview:   this.tasks.filter(t => t.status === 'In Review').length,
+      done:       this.tasks.filter(t => t.status === 'Done').length,
+    };
+  }
+
+  get donutGradient(): string {
+    const { todo, inProgress, inReview, done } = this.taskStatusCounts;
+    const total = todo + inProgress + inReview + done;
+    if (total === 0) return 'conic-gradient(#e2e8f0 0% 100%)';
+    const toDeg = (n: number) => (n / total) * 360;
+    const d1 = toDeg(done);
+    const d2 = d1 + toDeg(inReview);
+    const d3 = d2 + toDeg(inProgress);
+    return `conic-gradient(#22c55e 0deg ${d1}deg, #6366f1 ${d1}deg ${d2}deg, #f59e0b ${d2}deg ${d3}deg, #94a3b8 ${d3}deg 360deg)`;
+  }
+
+  ngOnDestroy(): void { this.destroy$.next(); this.destroy$.complete(); }
 
   constructor(
     private readonly projectService: ProjectService,
@@ -48,7 +73,8 @@ export class DashboardComponent implements OnInit {
     combineLatest([
       this.projectService.projects$,
       this.taskService.tasks$
-    ]).subscribe(([projects, tasks]) => {
+    ]).pipe(takeUntil(this.destroy$)).subscribe(([projects, tasks]) => {
+      this.tasks = tasks;
       this.totalProjects = projects.length;
       this.completedTasks = tasks.filter(x => x.status === 'Done').length;
       this.pendingTasks   = tasks.filter(x => x.status !== 'Done').length;

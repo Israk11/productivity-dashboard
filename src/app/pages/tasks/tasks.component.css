@@ -378,6 +378,161 @@
   font-size: 0.8rem;
 }
 
+/* ── View Toggle ──────────────────────────────────────────────────── */
+.view-toggle { display: flex; gap: 2px; background: var(--bg); border-radius: 8px; padding: 2px; border: 1px solid var(--border); }
+.btn-view {
+  padding: 6px 14px; border: none; border-radius: 6px; font-size: 0.82rem;
+  font-weight: 600; cursor: pointer; background: transparent; color: var(--text-muted); transition: all 0.15s;
+}
+.btn-view.active { background: var(--surface); color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+/* ── My Tasks / Overdue tabs ──────────────────────────────────────── */
+.tab-mine   { border-color: #6366f1 !important; color: #6366f1 !important; }
+.tab-mine.active { background: #6366f1 !important; color: white !important; }
+.tab-overdue   { border-color: #ef4444 !important; color: #ef4444 !important; }
+.tab-overdue.active { background: #ef4444 !important; color: white !important; }
+
+/* ── Blocker chip ─────────────────────────────────────────────────── */
+.chip-blocked {
+  background: #fff1f2 !important;
+  color: #be123c !important;
+  border-color: #fecdd3 !important;
+  font-weight: 600;
+}
+
+/* ── Comments ─────────────────────────────────────────────────────── */
+.btn-comments {
+  margin-top: 8px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline dotted;
+}
+.btn-comments:hover { color: var(--primary); }
+
+.comments-panel {
+  margin-top: 10px;
+  border-left: 2px solid #6366f1;
+  padding-left: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.comment-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 0.82rem;
+}
+.comment-author { font-weight: 700; color: var(--primary); }
+.comment-text { color: var(--text); }
+.comment-time { color: var(--text-muted); font-size: 0.72rem; }
+.comments-empty { font-size: 0.82rem; color: var(--text-muted); font-style: italic; }
+.comment-input-row { display: flex; gap: 8px; margin-top: 6px; }
+.comment-input {
+  flex: 1;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  background: var(--bg);
+  color: var(--text);
+}
+.comment-input:focus { outline: none; border-color: var(--primary); }
+.btn-submit-comment {
+  padding: 7px 14px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-submit-comment:hover { background: var(--primary-dark); }
+
+/* ── Kanban Board ─────────────────────────────────────────────────── */
+.kanban-board {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .kanban-board { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
+  .kanban-board { grid-template-columns: 1fr; }
+}
+.kanban-col {
+  background: var(--bg);
+  border-radius: var(--radius);
+  padding: 12px;
+  min-height: 200px;
+}
+.kanban-col-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.kanban-badge {
+  background: var(--border);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+.kanban-cards { display: flex; flex-direction: column; gap: 10px; }
+.kanban-card {
+  background: var(--surface);
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: var(--shadow);
+  border-left: 3px solid #e2e8f0;
+  transition: box-shadow 0.2s;
+}
+.kanban-card:hover { box-shadow: var(--shadow-hover); }
+.kanban-card.kanban-overdue { border-left-color: #ef4444; }
+.kanban-card.kanban-blocked { border-left-color: #be123c; background: #fff1f2; }
+.kanban-card-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+.kanban-blocked-label {
+  font-size: 0.72rem;
+  color: #be123c;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.kanban-card-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 8px;
+}
+.kanban-card-actions {
+  display: flex;
+  gap: 5px;
+  margin-top: 4px;
+}
+.kanban-empty {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  text-align: center;
+  padding: 24px 0;
+  font-style: italic;
+}
+
 /* ── Status modal ─────────────────────────────────────────────────── */
 .modal-sm { max-width: 480px; }
 .status-modal-task-name {

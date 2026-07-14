@@ -107,8 +107,8 @@
     {
       "id": "3",
       "title": "Build Reactive Services",
-      "status": "In Review",
-      "completed": false,
+      "status": "Done",
+      "completed": true,
       "priority": "Medium",
       "assignedTo": "Alice",
       "startDate": "2026-06-02",
@@ -138,14 +138,20 @@
           "changedBy": "Alice",
           "changedAt": "2026-07-04T08:16:32.178Z",
           "comment": "task completed. in review"
+        },
+        {
+          "status": "Done",
+          "changedBy": "Alice",
+          "changedAt": "2026-07-04T08:19:57.506Z",
+          "comment": "completed."
         }
       ]
     },
     {
       "id": "4",
       "title": "Integrate AI model API",
-      "status": "In Progress",
-      "completed": false,
+      "status": "Done",
+      "completed": true,
       "priority": "Critical",
       "assignedTo": "Alice",
       "startDate": "2026-06-15",
@@ -163,13 +169,25 @@
           "changedBy": "Alice",
           "changedAt": "2026-06-20T11:00:00.000Z",
           "comment": "API keys obtained, starting integration"
+        },
+        {
+          "status": "In Review",
+          "changedBy": "Alice",
+          "changedAt": "2026-07-14T07:28:23.833Z",
+          "comment": ""
+        },
+        {
+          "status": "Done",
+          "changedBy": "Alice",
+          "changedAt": "2026-07-14T07:59:00.739Z",
+          "comment": "task completed. was delayed due to dependency."
         }
       ]
     },
     {
       "id": "5",
       "title": "Write unit tests for modules",
-      "status": "Todo",
+      "status": "In Review",
       "completed": false,
       "priority": "Medium",
       "assignedTo": "David",
@@ -182,8 +200,15 @@
           "changedBy": "Alice",
           "changedAt": "2026-06-20T09:00:00.000Z",
           "comment": "Task created and assigned"
+        },
+        {
+          "status": "In Progress",
+          "changedBy": "Alice",
+          "changedAt": "2026-07-04T08:19:40.593Z",
+          "comment": ""
         }
-      ]
+      ],
+      "blockedBy": []
     },
     {
       "id": "6",

@@ -29,6 +29,42 @@
     </div>
   </div>
 
+  <!-- Task Status Chart -->
+  <div class="chart-section">
+    <h2 class="section-title">Task Breakdown</h2>
+    @if (tasks.length === 0) {
+      <p class="activity-empty">No tasks yet.</p>
+    } @else {
+      <div class="chart-row">
+        <div class="donut-wrapper">
+          <div class="donut" [style.background]="donutGradient"></div>
+          <div class="donut-hole">
+            <span class="donut-total">{{ tasks.length }}</span>
+            <span class="donut-label">Tasks</span>
+          </div>
+        </div>
+        <div class="donut-legend">
+          <div class="legend-item">
+            <span class="legend-dot dot-done"></span>
+            <span>Done <strong>{{ taskStatusCounts.done }}</strong></span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot dot-review"></span>
+            <span>In Review <strong>{{ taskStatusCounts.inReview }}</strong></span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot dot-progress"></span>
+            <span>In Progress <strong>{{ taskStatusCounts.inProgress }}</strong></span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot dot-todo"></span>
+            <span>Todo <strong>{{ taskStatusCounts.todo }}</strong></span>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
   <div class="progress-section">
     <h2 class="section-title">Project Progress</h2>
     @if (projectProgressList.length === 0) {

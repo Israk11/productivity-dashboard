@@ -52,4 +52,6 @@ export class ProjectService {
   getProjectById(id: string): Project | undefined {
     return this.projectsSubject.value.find(p => p.id === id);
   }
+
+  get projects(): Project[] { return this.projectsSubject.value; }
 }

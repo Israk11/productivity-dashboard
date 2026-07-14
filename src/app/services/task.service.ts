@@ -11,6 +11,13 @@ export interface StatusHistoryEntry {
   comment: string;
 }
 
+export interface Comment {
+  id?: string;
+  author: string;
+  text: string;
+  createdAt: string;
+}
+
 export interface Task {
   id?: string;
   title: string;
@@ -22,6 +29,8 @@ export interface Task {
   dueDate?: string;
   projectId?: string;
   statusHistory?: StatusHistoryEntry[];
+  comments?: Comment[];
+  blockedBy?: string[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -70,6 +79,21 @@ export class TaskService {
   deleteTask(id: string) {
     return this.http.delete(`${this.apiUrl}/${id}`).pipe(
       tap(() => this.tasksSubject.next(this.tasksSubject.value.filter(t => t.id !== id)))
+    );
+  }
+
+  get tasks(): Task[] { return this.tasksSubject.value; }
+
+  addComment(taskId: string, comment: Comment) {
+    const task = this.tasksSubject.value.find(t => t.id === taskId);
+    if (!task) return null;
+    const comments = [...(task.comments ?? []), comment];
+    return this.http.patch<Task>(`${this.apiUrl}/${taskId}`, { comments }).pipe(
+      tap(updated =>
+        this.tasksSubject.next(
+          this.tasksSubject.value.map(t => (t.id === taskId ? { ...t, ...updated } : t))
+        )
+      )
     );
   }
 
