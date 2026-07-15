@@ -1,69 +1,47 @@
+<p-toast />
 <div class="container">
 
-  @if (toast) {
-    <div class="toast" [ngClass]="{'toast-error': toast.type === 'error'}">
-      {{ toast.message }}
-    </div>
-  }
+  <!-- Page Toolbar -->
+  <p-toolbar styleClass="page-toolbar">
+    <ng-template pTemplate="start">
+      <div>
+        <h1 class="page-title">Tasks</h1>
+        <p class="page-subtitle">{{ pendingCount }} pending · {{ completedCount }} done</p>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="end">
+      <div class="header-actions">
+        @if (isManager) {
+          <p-button label="Mark All Done" icon="pi pi-check" severity="secondary" (onClick)="markAllComplete()" />
+        }
+        <p-button label="Export CSV" icon="pi pi-download" severity="secondary" (onClick)="exportCSV()" />
+        @if (isManager) {
+          <p-button label="Add Task" icon="pi pi-plus" (onClick)="openModal()" />
+        }
+      </div>
+    </ng-template>
+  </p-toolbar>
 
-  <div class="page-header">
-    <div>
-      <h1 class="page-title">Tasks</h1>
-      <p class="page-subtitle">{{ pendingCount }} pending · {{ completedCount }} done</p>
-    </div>
-    <div class="header-actions">
-      @if (isManager) {
-        <button class="btn-secondary" (click)="markAllComplete()">✔ Mark All Done</button>
-      }
-      <button class="btn-secondary" (click)="exportCSV()">⬇ Export CSV</button>
-      @if (isManager) {
-        <button class="btn-add" (click)="openModal()">+ Add Task</button>
-      }
-    </div>
-  </div>
-
+  <!-- Controls: search, sort, view toggle -->
   <div class="controls-row">
-    <input
-      class="search-input"
-      type="text"
-      placeholder="🔍 Search by title or developer..."
-      [value]="searchQuery"
-      (input)="setSearchQuery($event)"
-    />
-    <select class="sort-select" (change)="setSortField($event)">
-      <option value="">Sort by…</option>
-      <option value="dueDate">Due Date</option>
-      <option value="priority">Priority</option>
-      <option value="title">Title A–Z</option>
-    </select>
+    <p-iconField iconPosition="left" class="search-field">
+      <p-inputIcon styleClass="pi pi-search" />
+      <input pInputText type="text" placeholder="Search by title or developer..."
+        [value]="searchQuery" (input)="setSearchQuery($event)" class="w-full" />
+    </p-iconField>
+    <p-select [options]="sortOptions" [(ngModel)]="sortField"
+      placeholder="Sort by…" optionLabel="label" optionValue="value" styleClass="sort-select" />
     <div class="view-toggle">
       <button class="btn-view" [class.active]="viewMode === 'list'" (click)="setView('list')">☰ List</button>
       <button class="btn-view" [class.active]="viewMode === 'kanban'" (click)="setView('kanban')">⊞ Kanban</button>
     </div>
   </div>
 
-  <div class="filter-tabs">
-    <button class="tab" [class.active]="filter === 'all'" (click)="setFilter('all')">
-      All ({{ tasks.length }})
-    </button>
-    <button class="tab tab-mine" [class.active]="filter === 'mine'" (click)="setFilter('mine')">
-      My Tasks ({{ myTaskCount }})
-    </button>
-    <button class="tab tab-overdue" [class.active]="filter === 'overdue'" (click)="setFilter('overdue')">
-      Overdue ({{ overdueTaskCount }})
-    </button>
-    <button class="tab" [class.active]="filter === 'Todo'" (click)="setFilter('Todo')">
-      Todo ({{ taskCountByStatus('Todo') }})
-    </button>
-    <button class="tab" [class.active]="filter === 'In Progress'" (click)="setFilter('In Progress')">
-      In Progress ({{ taskCountByStatus('In Progress') }})
-    </button>
-    <button class="tab" [class.active]="filter === 'In Review'" (click)="setFilter('In Review')">
-      In Review ({{ taskCountByStatus('In Review') }})
-    </button>
-    <button class="tab" [class.active]="filter === 'Done'" (click)="setFilter('Done')">
-      Done ({{ taskCountByStatus('Done') }})
-    </button>
+  <!-- Filter: SelectButton -->
+  <div class="filter-row">
+    <p-selectButton [options]="filterButtonOptions" [(ngModel)]="filter"
+      (ngModelChange)="setFilter($event)" optionLabel="label" optionValue="value"
+      styleClass="filter-select-btn" />
   </div>
 
   @if (filteredTasks.length === 0 && viewMode === 'list') {
@@ -78,23 +56,20 @@
   } @else if (viewMode === 'list') {
     <div class="task-list">
       @for (task of filteredTasks; track task.id) {
-        <div class="task-item" [class.completed]="task.status === 'Done'">
-
+        <p-card [styleClass]="task.status === 'Done' ? 'task-card task-done' : 'task-card'">
           <!-- Main row -->
           <div class="task-main">
             <div class="task-left">
-              <span class="status-pill" [ngClass]="statusClass(task.status)">{{ task.status }}</span>
+              <p-tag [value]="task.status" [severity]="getStatusSeverity(task.status)" />
               <span class="task-title">{{ task.title }}</span>
             </div>
             <div class="task-actions">
               @if (canChangeStatus(task)) {
-                <button class="btn-icon btn-status" (click)="openStatusModal(task)" aria-label="Change status">
-                  ↔ Status
-                </button>
+                <p-button label="Status" icon="pi pi-arrows-h" severity="secondary" size="small" (onClick)="openStatusModal(task)" />
               }
               @if (isManager) {
-                <button class="btn-icon btn-edit"   (click)="openModal(task)"      aria-label="Edit task">✏️</button>
-                <button class="btn-icon btn-delete" (click)="deleteTask(task.id!)" aria-label="Delete task">🗑️</button>
+                <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary" size="small" (onClick)="openModal(task)" />
+                <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" size="small" (onClick)="deleteTask(task.id!)" />
               }
             </div>
           </div>
@@ -102,43 +77,30 @@
           <!-- Meta chips -->
           <div class="task-meta">
             @if (task.priority) {
-              <span class="priority-tag" [ngClass]="priorityClass(task.priority)">{{ task.priority }}</span>
+              <p-tag [value]="task.priority" [severity]="getPrioritySeverity(task.priority)" styleClass="priority-tag-sm" />
             }
             @if (task.assignedTo) {
-              <span class="meta-chip">👤 {{ task.assignedTo }}</span>
+              <p-chip [label]="task.assignedTo" icon="pi pi-user" />
             }
             @if (task.startDate) {
-              <span class="meta-chip">🗓 Start: {{ task.startDate }}</span>
+              <p-chip [label]="'Start: ' + task.startDate" icon="pi pi-calendar" />
             }
             @if (task.dueDate) {
-              <span
-                class="meta-chip due-chip"
-                [class.chip-overdue]="!task.completed && isOverdue(task.dueDate)"
-                [class.chip-today]="!task.completed && isDueToday(task.dueDate)"
-              >
-                📅 Due: {{ task.dueDate }}
-                @if (!task.completed && isOverdue(task.dueDate)) {
-                  <span class="badge-overdue">Overdue</span>
-                }
-                @if (!task.completed && isDueToday(task.dueDate)) {
-                  <span class="badge-today">Today</span>
-                }
-              </span>
+              <p-chip [label]="'Due: ' + task.dueDate" icon="pi pi-clock"
+                [styleClass]="!task.completed && isOverdue(task.dueDate) ? 'chip-overdue' : !task.completed && isDueToday(task.dueDate) ? 'chip-today' : ''" />
             }
             @if (task.projectId) {
-              <span class="meta-chip chip-project">📁 {{ getProjectName(task.projectId) }}</span>
+              <p-chip [label]="getProjectName(task.projectId)" icon="pi pi-folder" styleClass="chip-project" />
             }
             @if (isBlocked(task)) {
-              <span class="meta-chip chip-blocked">🚫 Blocked: {{ getBlockerTitle(task) }}</span>
+              <p-chip [label]="'Blocked: ' + getBlockerTitle(task)" icon="pi pi-ban" styleClass="chip-blocked" />
             }
           </div>
 
           <!-- History toggle -->
           @if (task.statusHistory && task.statusHistory.length > 0) {
-            <button class="btn-history" (click)="toggleHistory(task.id!)">
-              {{ expandedHistoryId === task.id ? '▲' : '▼' }}
-              History ({{ task.statusHistory.length }} entries)
-            </button>
+            <p-button [label]="(expandedHistoryId === task.id ? 'Hide' : 'Show') + ' History (' + task.statusHistory.length + ')'"
+              icon="pi pi-history" [text]="true" size="small" severity="secondary" (onClick)="toggleHistory(task.id!)" />
           }
 
           <!-- History panel -->
@@ -161,9 +123,8 @@
           }
 
           <!-- Comments -->
-          <button class="btn-comments" (click)="toggleComments(task.id!)">
-            💬 {{ task.comments?.length || 0 }} Comment{{ (task.comments?.length || 0) === 1 ? '' : 's' }}
-          </button>
+          <p-button [label]="'Comments (' + (task.comments?.length || 0) + ')'" icon="pi pi-comment"
+            [text]="true" size="small" severity="secondary" (onClick)="toggleComments(task.id!)" />
           @if (expandedCommentId === task.id) {
             <div class="comments-panel">
               @if (task.comments && task.comments.length > 0) {
@@ -178,16 +139,16 @@
                 <p class="comments-empty">No comments yet.</p>
               }
               <div class="comment-input-row">
-                <input class="comment-input" type="text" placeholder="Write a comment…"
+                <input pInputText class="comment-input" type="text" placeholder="Write a comment…"
                   [value]="newCommentText"
                   (input)="newCommentText = $any($event.target).value"
                   (keydown.enter)="submitComment(task)" />
-                <button class="btn-submit-comment" (click)="submitComment(task)">Send</button>
+                <p-button label="Send" icon="pi pi-send" size="small" (onClick)="submitComment(task)" />
               </div>
             </div>
           }
 
-        </div>
+        </p-card>
       }
     </div>
   }
@@ -198,7 +159,7 @@
       @for (col of kanbanColumns; track col.status) {
         <div class="kanban-col">
           <div class="kanban-col-header">
-            <span class="status-pill" [ngClass]="statusClass(col.status)">{{ col.status }}</span>
+            <p-tag [value]="col.status" [severity]="getStatusSeverity(col.status)" />
             <span class="kanban-badge">{{ col.tasks.length }}</span>
           </div>
           <div class="kanban-cards">
@@ -212,7 +173,7 @@
                 }
                 <div class="kanban-card-footer">
                   @if (task.priority) {
-                    <span class="priority-tag" [ngClass]="priorityClass(task.priority)">{{ task.priority }}</span>
+                    <p-tag [value]="task.priority" [severity]="getPrioritySeverity(task.priority)" styleClass="priority-tag-sm" />
                   }
                   @if (task.assignedTo) {
                     <span class="meta-chip">👤 {{ task.assignedTo }}</span>
@@ -245,139 +206,98 @@
 
 </div>
 
-<!-- ── Add/Edit Task Modal (Manager only) ─────────────────────────────────── -->
-@if (showModal) {
-  <div class="modal-backdrop" (click)="closeModal()"></div>
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="task-modal-title">
-    <div class="add-form modal-form">
-      <div class="modal-header">
-        <h2 class="form-title" id="task-modal-title">
-          {{ editMode ? 'Edit Task' : 'Add New Task' }}
-        </h2>
-        <button class="btn-close" (click)="closeModal()" aria-label="Close modal">✕</button>
+<!-- ── Add/Edit Task Dialog ──────────────────────────────────────────────── -->
+<p-dialog
+  [header]="editMode ? 'Edit Task' : 'Add New Task'"
+  [(visible)]="showModal"
+  [modal]="true"
+  [style]="{ width: 'min(760px, calc(100vw - 32px))' }"
+  [draggable]="false"
+  [resizable]="false"
+  (onHide)="closeModal()">
+  <form [formGroup]="taskForm" (ngSubmit)="submitTask()">
+    <div class="form-grid">
+      <div class="field full-width">
+        <label for="task-title">Task Title</label>
+        <input pInputText id="task-title" type="text" formControlName="title" placeholder="Describe the task" class="w-full" />
+        @if (taskForm.get('title')?.invalid && taskForm.get('title')?.touched) {
+          <span class="error">Minimum 3 characters required</span>
+        }
       </div>
-      <form [formGroup]="taskForm" (ngSubmit)="submitTask()">
-        <div class="form-grid">
-          <div class="field full-width">
-            <label for="task-title">Task Title</label>
-            <input id="task-title" type="text" formControlName="title" placeholder="Describe the task" />
-            @if (taskForm.get('title')?.invalid && taskForm.get('title')?.touched) {
-              <span class="error">Minimum 3 characters required</span>
-            }
-          </div>
-          <div class="field">
-            <label for="task-status">Status</label>
-            <select id="task-status" formControlName="status">
-              @for (s of taskStatuses; track s) {
-                <option [value]="s">{{ s }}</option>
-              }
-            </select>
-          </div>
-          <div class="field">
-            <label for="task-priority">Priority</label>
-            <select id="task-priority" formControlName="priority">
-              <option value="Low">🟢 Low</option>
-              <option value="Medium">🟡 Medium</option>
-              <option value="High">🟠 High</option>
-              <option value="Critical">🔴 Critical</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="task-assignedTo">Assign To</label>
-            <select id="task-assignedTo" formControlName="assignedTo">
-              <option value="">— Select member —</option>
-              <option value="Alice">Alice</option>
-              <option value="Bob">Bob</option>
-              <option value="Carol">Carol</option>
-              <option value="David">David</option>
-              <option value="Eve">Eve</option>
-            </select>
-            @if (taskForm.get('assignedTo')?.invalid && taskForm.get('assignedTo')?.touched) {
-              <span class="error">Please assign a member</span>
-            }
-          </div>
-          <div class="field">
-            <label for="task-startDate">Start Date</label>
-            <input id="task-startDate" type="date" formControlName="startDate" />
-            @if (taskForm.get('startDate')?.invalid && taskForm.get('startDate')?.touched) {
-              <span class="error">Required</span>
-            }
-          </div>
-          <div class="field">
-            <label for="task-dueDate">Due Date</label>
-            <input id="task-dueDate" type="date" formControlName="dueDate" />
-            @if (taskForm.get('dueDate')?.invalid && taskForm.get('dueDate')?.touched) {
-              <span class="error">Required</span>
-            }
-          </div>
-          <div class="field full-width">
-            <label for="task-projectId">Link to Project (optional)</label>
-            <select id="task-projectId" formControlName="projectId">
-              <option value="">— No project —</option>
-              @for (p of projects; track p.id) {
-                <option [value]="p.id">{{ p.name }}</option>
-              }
-            </select>
-          </div>
-          <div class="field full-width">
-            <label for="task-blockedBy">Blocked By (optional)</label>
-            <select id="task-blockedBy" formControlName="blockedBy">
-              <option value="">— Not blocked —</option>
-              @for (t of otherTasks; track t.id) {
-                <option [value]="t.id">{{ t.title }}</option>
-              }
-            </select>
-          </div>
-        </div>
-        <div class="form-actions">
-          <button type="submit" class="btn-submit" [disabled]="taskForm.invalid">
-            {{ editMode ? 'Update Task' : 'Add Task' }}
-          </button>
-          <button type="button" class="btn-cancel" (click)="closeModal()">Cancel</button>
-        </div>
-      </form>
+      <div class="field">
+        <label>Status</label>
+        <p-select formControlName="status" [options]="taskStatuses" styleClass="w-full" />
+      </div>
+      <div class="field">
+        <label>Priority</label>
+        <p-select formControlName="priority" [options]="priorities" styleClass="w-full" />
+      </div>
+      <div class="field">
+        <label>Assign To</label>
+        <p-select formControlName="assignedTo" [options]="teamMemberNames" placeholder="Select member" styleClass="w-full" />
+        @if (taskForm.get('assignedTo')?.invalid && taskForm.get('assignedTo')?.touched) {
+          <span class="error">Please assign a member</span>
+        }
+      </div>
+      <div class="field">
+        <label for="task-startDate">Start Date</label>
+        <input pInputText id="task-startDate" type="date" formControlName="startDate" class="w-full" />
+        @if (taskForm.get('startDate')?.invalid && taskForm.get('startDate')?.touched) {
+          <span class="error">Required</span>
+        }
+      </div>
+      <div class="field">
+        <label for="task-dueDate">Due Date</label>
+        <input pInputText id="task-dueDate" type="date" formControlName="dueDate" class="w-full" />
+        @if (taskForm.get('dueDate')?.invalid && taskForm.get('dueDate')?.touched) {
+          <span class="error">Required</span>
+        }
+      </div>
+      <div class="field full-width">
+        <label>Link to Project (optional)</label>
+        <p-select formControlName="projectId" [options]="projects" optionLabel="name" optionValue="id"
+          placeholder="No project" [showClear]="true" styleClass="w-full" />
+      </div>
+      <div class="field full-width">
+        <label>Blocked By (optional)</label>
+        <p-select formControlName="blockedBy" [options]="otherTasks" optionLabel="title" optionValue="id"
+          placeholder="Not blocked" [showClear]="true" styleClass="w-full" />
+      </div>
     </div>
-  </div>
-}
+    <div class="form-actions">
+      <p-button type="submit" [label]="editMode ? 'Update Task' : 'Add Task'" icon="pi pi-check" [disabled]="taskForm.invalid" />
+      <p-button type="button" label="Cancel" severity="secondary" (onClick)="closeModal()" />
+    </div>
+  </form>
+</p-dialog>
 
-<!-- ── Status Change Modal ─────────────────────────────────────────────────── -->
-@if (showStatusModal && statusTask) {
-  <div class="modal-backdrop" (click)="closeStatusModal()"></div>
-  <div class="modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="status-modal-title">
-    <div class="add-form modal-form">
-      <div class="modal-header">
-        <h2 class="form-title" id="status-modal-title">Change Status</h2>
-        <button class="btn-close" (click)="closeStatusModal()" aria-label="Close">✕</button>
+<!-- ── Status Change Dialog ───────────────────────────────────────────────── -->
+<p-dialog
+  header="Change Status"
+  [(visible)]="showStatusModal"
+  [modal]="true"
+  [style]="{ width: '420px' }"
+  [draggable]="false"
+  [resizable]="false"
+  (onHide)="closeStatusModal()">
+  @if (statusTask) {
+    <p class="status-modal-task-name">{{ statusTask.title }}</p>
+    <form [formGroup]="statusForm" (ngSubmit)="submitStatusChange()">
+      <div class="form-grid">
+        <div class="field full-width">
+          <label>New Status</label>
+          <p-select formControlName="newStatus" [options]="taskStatuses" styleClass="w-full" />
+        </div>
+        <div class="field full-width">
+          <label for="status-comment">Comment (optional)</label>
+          <textarea pTextarea id="status-comment" formControlName="comment"
+            placeholder="Add a note about this status change…" rows="3" class="w-full"></textarea>
+        </div>
       </div>
-      <p class="status-modal-task-name">{{ statusTask.title }}</p>
-      <form [formGroup]="statusForm" (ngSubmit)="submitStatusChange()">
-        <div class="form-grid">
-          <div class="field full-width">
-            <label for="status-new">New Status</label>
-            <select id="status-new" formControlName="newStatus">
-              @for (s of taskStatuses; track s) {
-                <option [value]="s">{{ s }}</option>
-              }
-            </select>
-          </div>
-          <div class="field full-width">
-            <label for="status-comment">Comment (optional)</label>
-            <textarea
-              id="status-comment"
-              class="field-textarea"
-              formControlName="comment"
-              placeholder="Add a note about this status change…"
-              rows="3"
-            ></textarea>
-          </div>
-        </div>
-        <div class="form-actions">
-          <button type="submit" class="btn-submit" [disabled]="statusForm.invalid">
-            Update Status
-          </button>
-          <button type="button" class="btn-cancel" (click)="closeStatusModal()">Cancel</button>
-        </div>
-      </form>
-    </div>
-  </div>
-}
+      <div class="form-actions">
+        <p-button type="submit" label="Update Status" icon="pi pi-check" [disabled]="statusForm.invalid" />
+        <p-button type="button" label="Cancel" severity="secondary" (onClick)="closeStatusModal()" />
+      </div>
+    </form>
+  }
+</p-dialog>

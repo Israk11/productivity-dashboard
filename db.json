@@ -3,7 +3,7 @@
     {
       "id": "1",
       "name": "AI Agent Integration",
-      "status": "In Progress",
+      "status": "Completed",
       "owner": "Alice",
       "developer": "Alice",
       "lead": "Bob",
@@ -187,8 +187,8 @@
     {
       "id": "5",
       "title": "Write unit tests for modules",
-      "status": "In Review",
-      "completed": false,
+      "status": "Done",
+      "completed": true,
       "priority": "Medium",
       "assignedTo": "David",
       "startDate": "2026-06-20",
@@ -208,7 +208,9 @@
           "comment": ""
         }
       ],
-      "blockedBy": []
+      "blockedBy": [
+        "8"
+      ]
     },
     {
       "id": "6",
@@ -312,8 +314,8 @@
     {
       "id": "BPlXiCF4-KM",
       "title": "Front end development",
-      "status": "In Progress",
-      "completed": false,
+      "status": "Done",
+      "completed": true,
       "priority": "High",
       "assignedTo": "Bob",
       "startDate": "2026-06-01",
@@ -333,6 +335,26 @@
           "comment": "Started UI development"
         }
       ]
+    },
+    {
+      "title": "Services testing",
+      "status": "In Progress",
+      "priority": "High",
+      "assignedTo": "David",
+      "startDate": "2026-07-14",
+      "dueDate": "2026-07-31",
+      "blockedBy": [],
+      "completed": false,
+      "statusHistory": [
+        {
+          "status": "In Progress",
+          "changedBy": "Alice",
+          "changedAt": "2026-07-14T11:03:56.484Z",
+          "comment": "Task created"
+        }
+      ],
+      "id": "hGpzVa1Pk1o",
+      "projectId": "dJN_UcM6fRw"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

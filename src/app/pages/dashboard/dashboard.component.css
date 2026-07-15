@@ -1,9 +1,72 @@
-.section-title {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 16px;
+/* ── Stat Cards ── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 28px;
 }
+
+:host ::ng-deep .stat-card .p-card-body { padding: 20px; }
+:host ::ng-deep .stat-card .p-card-content { padding: 0; }
+
+.stat-content { display: flex; align-items: center; gap: 16px; }
+.stat-icon { font-size: 2rem; }
+.stat-card.card-blue  :host ::ng-deep,
+:host ::ng-deep .card-blue  { border-left: 4px solid #3b82f6; }
+:host ::ng-deep .card-green { border-left: 4px solid #22c55e; }
+:host ::ng-deep .card-orange{ border-left: 4px solid #f59e0b; }
+:host ::ng-deep .card-purple{ border-left: 4px solid #6366f1; }
+
+.card-blue  .stat-icon { color: #3b82f6; }
+.card-green .stat-icon { color: #22c55e; }
+.card-orange .stat-icon { color: #f59e0b; }
+.card-purple .stat-icon { color: #6366f1; }
+
+.stat-value { font-size: 2rem; font-weight: 700; color: var(--text); line-height: 1; }
+.stat-label { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; font-weight: 500; }
+
+/* ── Panel sections ── */
+:host ::ng-deep .dash-panel { margin-bottom: 28px; }
+
+/* ── Chart ── */
+.chart-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px 0;
+}
+
+/* ── Project progress ── */
+.project-progress-row { margin-bottom: 18px; }
+.project-progress-row:last-child { margin-bottom: 0; }
+.project-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.project-progress-name { font-weight: 600; font-size: 0.92rem; color: var(--text); }
+.project-progress-stat { font-size: 0.82rem; color: var(--text-muted); }
+
+/* ── Activity feed ── */
+.activity-empty { color: var(--text-muted); font-size: 0.88rem; }
+.activity-list { display: flex; flex-direction: column; gap: 10px; }
+.activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border-left: 3px solid transparent;
+}
+.activity-success { background: #f0fdf4; border-left-color: #22c55e; }
+.activity-danger  { background: #fef2f2; border-left-color: #ef4444; }
+.activity-warning { background: #fffbeb; border-left-color: #f59e0b; }
+.activity-info    { background: #eff6ff; border-left-color: #3b82f6; }
+.activity-icon    { font-size: 1.1rem; flex-shrink: 0; }
+.activity-body    { display: flex; flex-direction: column; gap: 2px; }
+.activity-label   { font-weight: 600; font-size: 0.88rem; color: var(--text); }
+.activity-sub     { font-size: 0.78rem; color: var(--text-muted); }
 
 /* ── Task Breakdown Chart ── */
 .chart-section {
@@ -98,88 +161,3 @@
   border-radius: 999px;
   transition: width 0.6s ease;
 }
-/* -- Activity feed -- */
-.activity-section {
-  margin-top: 28px;
-  background: var(--surface);
-  border-radius: var(--radius);
-  padding: 24px;
-  box-shadow: var(--shadow);
-}
-
-.activity-title {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 16px;
-}
-
-.activity-empty {
-  color: var(--text-muted);
-  font-size: 0.88rem;
-}
-
-.activity-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.activity-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 12px 14px;
-  border-radius: 8px;
-  border-left: 3px solid transparent;
-}
-
-.activity-success { background: #f0fdf4; border-left-color: #22c55e; }
-.activity-danger  { background: #fef2f2; border-left-color: #ef4444; }
-.activity-warning { background: #fffbeb; border-left-color: #f59e0b; }
-.activity-info    { background: #eff6ff; border-left-color: #3b82f6; }
-
-.activity-icon {
-  font-size: 1.1rem;
-  line-height: 1;
-  flex-shrink: 0;
-  margin-top: 1px;
-}
-
-.activity-body {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.activity-label {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.activity-sub {
-  font-size: 0.78rem;
-  color: var(--text-muted);
-}
-
-.section-title { font-size: 1rem; font-weight: 700; margin-bottom: 16px; }
-
-.project-progress-row { margin-bottom: 16px; }
-
-.project-progress-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 6px;
-}
-
-.project-progress-name { font-size: 0.88rem; font-weight: 600; }
-
-.project-progress-stat { font-size: 0.78rem; color: var(--text-muted); }
-
-.fill-complete { background: #22c55e !important; }

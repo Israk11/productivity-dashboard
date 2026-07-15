@@ -1,72 +1,50 @@
-<h2>Developer Productivity Dashboard</h2>
-
 <div class="dashboard">
   <div class="page-header">
     <h1 class="page-title">Dashboard</h1>
     <p class="page-subtitle">Welcome back! Here's your productivity overview.</p>
   </div>
 
+  <!-- Stat Cards -->
   <div class="stats-grid">
-    <div class="stat-card card-blue">
-      <div class="stat-icon">📁</div>
-      <div class="stat-value">{{ totalProjects }}</div>
-      <div class="stat-label">Total Projects</div>
-    </div>
-    <div class="stat-card card-green">
-      <div class="stat-icon">✅</div>
-      <div class="stat-value">{{ completedTasks }}</div>
-      <div class="stat-label">Completed Tasks</div>
-    </div>
-    <div class="stat-card card-orange">
-      <div class="stat-icon">⏳</div>
-      <div class="stat-value">{{ pendingTasks }}</div>
-      <div class="stat-label">Pending Tasks</div>
-    </div>
-    <div class="stat-card card-purple">
-      <div class="stat-icon">📈</div>
-      <div class="stat-value">{{ completionRate }}%</div>
-      <div class="stat-label">Completion Rate</div>
-    </div>
+    <p-card styleClass="stat-card card-blue">
+      <div class="stat-content">
+        <span class="stat-icon pi pi-folder-open"></span>
+        <div><div class="stat-value">{{ totalProjects }}</div><div class="stat-label">Total Projects</div></div>
+      </div>
+    </p-card>
+    <p-card styleClass="stat-card card-green">
+      <div class="stat-content">
+        <span class="stat-icon pi pi-check-circle"></span>
+        <div><div class="stat-value">{{ completedTasks }}</div><div class="stat-label">Completed Tasks</div></div>
+      </div>
+    </p-card>
+    <p-card styleClass="stat-card card-orange">
+      <div class="stat-content">
+        <span class="stat-icon pi pi-clock"></span>
+        <div><div class="stat-value">{{ pendingTasks }}</div><div class="stat-label">Pending Tasks</div></div>
+      </div>
+    </p-card>
+    <p-card styleClass="stat-card card-purple">
+      <div class="stat-content">
+        <span class="stat-icon pi pi-chart-line"></span>
+        <div><div class="stat-value">{{ completionRate }}%</div><div class="stat-label">Completion Rate</div></div>
+      </div>
+    </p-card>
   </div>
 
-  <!-- Task Status Chart -->
-  <div class="chart-section">
-    <h2 class="section-title">Task Breakdown</h2>
+  <!-- Task Breakdown Chart -->
+  <p-panel header="Task Breakdown" styleClass="dash-panel" [toggleable]="false">
     @if (tasks.length === 0) {
       <p class="activity-empty">No tasks yet.</p>
     } @else {
-      <div class="chart-row">
-        <div class="donut-wrapper">
-          <div class="donut" [style.background]="donutGradient"></div>
-          <div class="donut-hole">
-            <span class="donut-total">{{ tasks.length }}</span>
-            <span class="donut-label">Tasks</span>
-          </div>
-        </div>
-        <div class="donut-legend">
-          <div class="legend-item">
-            <span class="legend-dot dot-done"></span>
-            <span>Done <strong>{{ taskStatusCounts.done }}</strong></span>
-          </div>
-          <div class="legend-item">
-            <span class="legend-dot dot-review"></span>
-            <span>In Review <strong>{{ taskStatusCounts.inReview }}</strong></span>
-          </div>
-          <div class="legend-item">
-            <span class="legend-dot dot-progress"></span>
-            <span>In Progress <strong>{{ taskStatusCounts.inProgress }}</strong></span>
-          </div>
-          <div class="legend-item">
-            <span class="legend-dot dot-todo"></span>
-            <span>Todo <strong>{{ taskStatusCounts.todo }}</strong></span>
-          </div>
-        </div>
+      <div class="chart-container">
+        <p-chart type="doughnut" [data]="chartData" [options]="chartOptions" width="260" height="260" />
       </div>
     }
-  </div>
+  </p-panel>
 
-  <div class="progress-section">
-    <h2 class="section-title">Project Progress</h2>
+  <!-- Project Progress -->
+  <p-panel header="Project Progress" styleClass="dash-panel" [toggleable]="false">
     @if (projectProgressList.length === 0) {
       <p class="activity-empty">No projects yet.</p>
     } @else {
@@ -76,17 +54,14 @@
             <span class="project-progress-name">{{ p.name }}</span>
             <span class="project-progress-stat">{{ p.done }} / {{ p.total }} tasks · {{ p.progress }}%</span>
           </div>
-          <div class="progress-track">
-            <div class="progress-fill" [style.width.%]="p.progress"
-              [class.fill-complete]="p.progress === 100"></div>
-          </div>
+          <p-progressbar [value]="p.progress" [style]="{'height': '8px', 'border-radius': '999px'}" />
         </div>
       }
     }
-  </div>
+  </p-panel>
 
-  <div class="activity-section">
-    <h2 class="activity-title">Activity Feed</h2>
+  <!-- Activity Feed -->
+  <p-panel header="Activity Feed" styleClass="dash-panel" [toggleable]="false">
     @if (activityItems.length === 0) {
       <p class="activity-empty">No activity yet — add projects and tasks to get started.</p>
     } @else {
@@ -102,6 +77,5 @@
         }
       </div>
     }
-  </div>
-
+  </p-panel>
 </div>

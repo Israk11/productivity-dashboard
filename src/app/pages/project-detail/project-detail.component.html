@@ -10,7 +10,7 @@
     <div class="project-header">
       <div class="project-header-left">
         <h1 class="page-title">{{ project.name }}</h1>
-        <span class="badge" [ngClass]="statusClass(project.status)">{{ project.status }}</span>
+        <p-tag [value]="project.status" [severity]="getStatusSeverity(project.status)" />
         @if (isOverdue) {
           <span class="badge-overdue-label">🔴 Overdue</span>
         }
@@ -47,9 +47,7 @@
         <span class="section-title">Task Progress</span>
         <span class="progress-pct">{{ completedCount }} / {{ tasks.length }} done · {{ progress }}%</span>
       </div>
-      <div class="progress-track">
-        <div class="progress-fill" [style.width.%]="progress" [class.fill-complete]="progress === 100"></div>
-      </div>
+      <p-progressbar [value]="progress" [style]="{'height': '10px', 'border-radius': '999px'}" />
     </div>
 
     <div class="tasks-section">

@@ -3,13 +3,15 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { NgClass } from '@angular/common';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { ProgressBar } from 'primeng/progressbar';
+import { Tag } from 'primeng/tag';
 import { ProjectService, Project } from '../../services/project.service';
 import { TaskService, Task } from '../../services/task.service';
 
 @Component({
   selector: 'app-project-detail',
   standalone: true,
-  imports: [NgClass, RouterLink],
+  imports: [NgClass, RouterLink, ProgressBar, Tag],
   templateUrl: './project-detail.component.html',
   styleUrls: ['./project-detail.component.css']
 })
@@ -47,6 +49,13 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
   get isOverdue(): boolean {
     if (!this.project?.endDate || this.project.status === 'Completed') return false;
     return new Date(this.project.endDate) < new Date(new Date().toDateString());
+  }
+
+  getStatusSeverity(status: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' {
+    const map: Record<string, 'success' | 'info' | 'warn' | 'danger' | 'secondary'> = {
+      'Completed': 'success', 'In Progress': 'info', 'On Hold': 'warn', 'Blocked': 'danger', 'Not Started': 'secondary'
+    };
+    return map[status] ?? 'secondary';
   }
 
   statusClass(status: string): Record<string, boolean> {

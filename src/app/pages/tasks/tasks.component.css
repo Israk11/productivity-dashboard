@@ -1,3 +1,28 @@
+/* ── PrimeNG task card overrides ──────────────────────────────────── */
+.task-card {
+  border-left: 3px solid var(--primary);
+  transition: box-shadow 0.2s;
+  margin-bottom: 0;
+}
+.task-card:hover { box-shadow: var(--shadow-hover); }
+.task-done {
+  border-left-color: #22c55e !important;
+  opacity: 0.75;
+}
+
+/* ── Filter row ───────────────────────────────────────────────────── */
+.filter-row {
+  margin-bottom: 16px;
+}
+
+/* ── Search field — full rules in the controls-row section below ── */
+
+/* ── Priority tag (small) ─────────────────────────────────────────── */
+.priority-tag-sm {
+  font-size: 0.72rem !important;
+  padding: 2px 8px !important;
+}
+
 .filter-tabs {
   display: flex;
   gap: 8px;
@@ -158,8 +183,25 @@
 /* ── Search + sort controls ── */
 .controls-row {
   display: flex;
+  align-items: center;
   gap: 12px;
   margin-bottom: 16px;
+}
+
+/* Stretch the p-iconField host + its inner span and input */
+.search-field {
+  flex: 1;
+  display: flex;
+}
+::ng-deep .search-field .p-iconfield,
+::ng-deep .search-field span.p-iconfield {
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+::ng-deep .search-field .p-iconfield input.p-inputtext {
+  flex: 1;
+  min-width: 0;
 }
 
 .search-input {
@@ -175,16 +217,8 @@
 }
 .search-input:focus { outline: none; border-color: var(--primary); }
 
-.sort-select {
-  padding: 9px 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font-size: 0.88rem;
-  font-family: inherit;
-  background: var(--surface);
-  color: var(--text);
-  cursor: pointer;
-}
+/* Sort dropdown — keep PrimeNG's own styling, just fix width */
+.sort-select { width: 160px !important; }
 
 /* ── Task row layout ── */
 .task-main {
@@ -556,3 +590,26 @@
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
 }
+
+/* \u2500\u2500 Dark mode overrides \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+
+/* Chip colours */
+body.dark .chip-overdue  { background: rgba(239,68,68,0.18) !important;  color: #fca5a5 !important; border-color: rgba(239,68,68,0.35) !important; }
+body.dark .chip-today    { background: rgba(245,158,11,0.18) !important; color: #fde68a !important; border-color: rgba(245,158,11,0.35) !important; }
+body.dark .chip-project  { background: rgba(59,130,246,0.18) !important; color: #93c5fd !important; border-color: rgba(59,130,246,0.35) !important; }
+body.dark .chip-blocked  { background: rgba(190,18,60,0.18) !important;  color: #fda4af !important; border-color: rgba(190,18,60,0.35) !important; }
+
+/* Status pills */
+body.dark .status-todo       { background: rgba(148,163,184,0.18); color: #94a3b8; }
+body.dark .status-inprogress { background: rgba(59,130,246,0.18);  color: #93c5fd; }
+body.dark .status-inreview   { background: rgba(245,158,11,0.18);  color: #fde68a; }
+body.dark .status-done       { background: rgba(34,197,94,0.18);   color: #86efac; }
+
+/* Priority pills */
+body.dark .pri-low      { background: rgba(34,197,94,0.15);   color: #86efac; }
+body.dark .pri-medium   { background: rgba(234,179,8,0.15);   color: #fde68a; }
+body.dark .pri-high     { background: rgba(249,115,22,0.15);  color: #fdba74; }
+body.dark .pri-critical { background: rgba(239,68,68,0.15);   color: #fca5a5; }
+
+/* Kanban blocked card */
+body.dark .kanban-card.kanban-blocked { background: rgba(190,18,60,0.12); }

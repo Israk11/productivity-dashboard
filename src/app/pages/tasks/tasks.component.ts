@@ -1,11 +1,25 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { NgClass } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { MessageService, PrimeTemplate } from 'primeng/api';
+import { Toast } from 'primeng/toast';
+import { Dialog } from 'primeng/dialog';
+import { Button } from 'primeng/button';
+import { InputText } from 'primeng/inputtext';
+import { Select } from 'primeng/select';
+import { Tag } from 'primeng/tag';
+import { Textarea } from 'primeng/textarea';
+import { SelectButton } from 'primeng/selectbutton';
+import { Chip } from 'primeng/chip';
+import { Toolbar } from 'primeng/toolbar';
+import { IconField } from 'primeng/iconfield';
+import { InputIcon } from 'primeng/inputicon';
+import { Card } from 'primeng/card';
 import { TaskService, Task, TaskStatus, StatusHistoryEntry, Comment } from '../../services/task.service';
 import { ProjectService, Project } from '../../services/project.service';
-import { UserService } from '../../services/user.service';
+import { UserService, TEAM_MEMBERS } from '../../services/user.service';
 
 type TaskFilter = 'all' | TaskStatus | 'mine' | 'overdue';
 type SortField = 'dueDate' | 'priority' | 'title' | '';
@@ -15,7 +29,7 @@ export const TASK_STATUSES: TaskStatus[] = ['Todo', 'In Progress', 'In Review', 
 @Component({
   selector: 'app-tasks',
   standalone: true,
-  imports: [NgClass, ReactiveFormsModule],
+  imports: [NgClass, ReactiveFormsModule, FormsModule, PrimeTemplate, Toast, Dialog, Button, InputText, Select, Tag, Textarea, SelectButton, Chip, Toolbar, IconField, InputIcon, Card],
   templateUrl: './tasks.component.html',
   styleUrls: ['./tasks.component.css']
 })
@@ -52,6 +66,27 @@ export class TasksComponent implements OnInit, OnDestroy {
   isManager = false;
 
   readonly taskStatuses = TASK_STATUSES;
+  readonly priorities = ['Low', 'Medium', 'High', 'Critical'];
+  readonly teamMemberNames = TEAM_MEMBERS.map(m => m.name);
+  readonly sortOptions = [
+    { label: 'Due Date', value: 'dueDate' },
+    { label: 'Priority', value: 'priority' },
+    { label: 'Title A–Z', value: 'title' },
+  ];
+
+  get filterButtonOptions() {
+    return [
+      { label: `All (${this.tasks.length})`, value: 'all' },
+      { label: `Mine (${this.myTaskCount})`, value: 'mine' },
+      { label: `Overdue (${this.overdueTaskCount})`, value: 'overdue' },
+      { label: 'Todo', value: 'Todo' },
+      { label: 'In Progress', value: 'In Progress' },
+      { label: 'In Review', value: 'In Review' },
+      { label: 'Done', value: 'Done' },
+    ];
+  }
+
+  private readonly messageService = inject(MessageService);
 
   private readonly priorityOrder: Record<string, number> = {
     Critical: 4, High: 3, Medium: 2, Low: 1
@@ -184,6 +219,7 @@ export class TasksComponent implements OnInit, OnDestroy {
   // ── Filters / Sort ────────────────────────────────────────────────────────
   setFilter(f: TaskFilter): void { this.filter = f; }
   setView(mode: 'list' | 'kanban'): void { this.viewMode = mode; }
+  setSortValue(value: string): void { this.sortField = value as SortField; }
   setSortField(e: Event): void {
     this.sortField = (e.target as HTMLSelectElement).value as SortField;
   }
@@ -314,8 +350,26 @@ export class TasksComponent implements OnInit, OnDestroy {
 
   markAllComplete(): void { this.taskService.markAllComplete(); }
 
+  getStatusSeverity(status?: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' {
+    const map: Record<string, 'success' | 'info' | 'warn' | 'danger' | 'secondary'> = {
+      'Done': 'success', 'In Progress': 'info', 'In Review': 'warn', 'Todo': 'secondary'
+    };
+    return map[status ?? ''] ?? 'secondary';
+  }
+
+  getPrioritySeverity(p?: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' {
+    const map: Record<string, 'success' | 'info' | 'warn' | 'danger' | 'secondary'> = {
+      'Low': 'success', 'Medium': 'info', 'High': 'warn', 'Critical': 'danger'
+    };
+    return p ? (map[p] ?? 'secondary') : 'secondary';
+  }
+
   private showToast(message: string, type: 'success' | 'error' = 'success'): void {
-    this.toast = { message, type };
-    setTimeout(() => (this.toast = null), 3000);
+    this.messageService.add({
+      severity: type === 'error' ? 'error' : 'success',
+      summary: type === 'error' ? 'Error' : 'Success',
+      detail: message,
+      life: 3000
+    });
   }
 }

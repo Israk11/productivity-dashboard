@@ -1,4 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap');
+@import 'primeicons/primeicons.css';
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -54,3 +56,105 @@ body.dark {
   margin-left: 10px;
   vertical-align: middle;
 }
+
+/* ════════════════════════════════════════════════════════════════
+   DARK MODE — PrimeNG component overrides
+   Forces all PrimeNG surfaces to our dark CSS variables so the
+   theme toggle works reliably regardless of PrimeNG version quirks.
+   ════════════════════════════════════════════════════════════════ */
+
+/* ── Card ── */
+body.dark .p-card { background: var(--surface) !important; color: var(--text) !important; border-color: var(--border) !important; }
+body.dark .p-card-body,
+body.dark .p-card-content,
+body.dark .p-card-header,
+body.dark .p-card-footer,
+body.dark .p-card-title,
+body.dark .p-card-subtitle { background: transparent !important; color: inherit !important; }
+
+/* ── Toolbar ── */
+body.dark .p-toolbar { background: var(--surface) !important; border-color: var(--border) !important; color: var(--text) !important; }
+
+/* ── Panel ── */
+body.dark .p-panel { background: var(--surface) !important; border-color: var(--border) !important; }
+body.dark .p-panel-header { background: var(--surface) !important; border-color: var(--border) !important; color: var(--text) !important; }
+body.dark .p-panel-content { background: var(--surface) !important; color: var(--text) !important; }
+
+/* ── Dialog ── */
+body.dark .p-dialog { background: var(--surface) !important; border-color: var(--border) !important; color: var(--text) !important; }
+body.dark .p-dialog-header { background: var(--surface) !important; color: var(--text) !important; border-color: var(--border) !important; }
+body.dark .p-dialog-content { background: var(--surface) !important; color: var(--text) !important; }
+body.dark .p-dialog-footer { background: var(--surface) !important; border-color: var(--border) !important; }
+
+/* ── Select / Dropdown overlay ── */
+body.dark .p-select-overlay,
+body.dark .p-dropdown-panel,
+body.dark .p-select-panel { background: var(--surface) !important; border-color: var(--border) !important; color: var(--text) !important; }
+body.dark .p-select-option,
+body.dark .p-dropdown-item { color: var(--text) !important; }
+body.dark .p-select-option:hover,
+body.dark .p-dropdown-item:hover { background: var(--bg) !important; }
+body.dark .p-select-option.p-select-option-selected,
+body.dark .p-dropdown-item.p-highlight { background: rgba(99,102,241,0.2) !important; color: var(--primary) !important; }
+
+/* ── Select button (toggle group) ── */
+body.dark .p-selectbutton .p-button { background: var(--surface) !important; border-color: var(--border) !important; color: var(--text-muted) !important; }
+body.dark .p-selectbutton .p-button.p-button-active,
+body.dark .p-selectbutton .p-button[aria-pressed="true"] { background: var(--primary) !important; color: #fff !important; border-color: var(--primary) !important; }
+
+/* ── InputText ── */
+body.dark .p-inputtext { background: var(--bg) !important; color: var(--text) !important; border-color: var(--border) !important; }
+body.dark .p-inputtext::placeholder { color: var(--text-muted) !important; }
+body.dark .p-inputtext:focus { border-color: var(--primary) !important; box-shadow: 0 0 0 3px rgba(99,102,241,0.2) !important; }
+
+/* ── Textarea ── */
+body.dark .p-textarea { background: var(--bg) !important; color: var(--text) !important; border-color: var(--border) !important; }
+
+/* ── Select trigger (the input field part of p-select) ── */
+body.dark .p-select { background: var(--bg) !important; border-color: var(--border) !important; color: var(--text) !important; }
+body.dark .p-select .p-select-label { color: var(--text) !important; }
+body.dark .p-select .p-select-dropdown { color: var(--text-muted) !important; }
+
+/* ── Chip ── */
+body.dark .p-chip { background: var(--bg) !important; color: var(--text) !important; border-color: var(--border) !important; }
+body.dark .p-chip .p-chip-label { color: var(--text) !important; }
+
+/* ── Icon field ── */
+body.dark .p-iconfield .p-iconfield-icon { color: var(--text-muted) !important; }
+
+/* ── Progress bar ── */
+body.dark .p-progressbar { background: var(--border) !important; }
+
+/* ── Toast ── */
+body.dark .p-toast-message-success { background: #052e16 !important; border-color: #166534 !important; color: #86efac !important; }
+body.dark .p-toast-message-error   { background: #450a0a !important; border-color: #991b1b !important; color: #fca5a5 !important; }
+body.dark .p-toast-message-info    { background: #082f49 !important; border-color: #075985 !important; color: #7dd3fc !important; }
+body.dark .p-toast-message-warn    { background: #422006 !important; border-color: #92400e !important; color: #fde68a !important; }
+body.dark .p-toast-message-content { color: inherit !important; }
+body.dark .p-toast-summary,
+body.dark .p-toast-detail { color: inherit !important; }
+
+/* ── Divider / general text ── */
+body.dark .p-divider-horizontal:before { border-color: var(--border) !important; }
+body.dark label { color: var(--text-muted); }
+
+/* ── Activity feed (Dashboard) — global so p-panel projection doesn't break encapsulation ── */
+body.dark .activity-item { color: var(--text) !important; }
+body.dark .activity-success {
+  background: rgba(34,197,94,0.15) !important;
+  border-left-color: #22c55e !important;
+}
+body.dark .activity-danger {
+  background: rgba(239,68,68,0.15) !important;
+  border-left-color: #ef4444 !important;
+}
+body.dark .activity-warning {
+  background: rgba(245,158,11,0.15) !important;
+  border-left-color: #f59e0b !important;
+}
+body.dark .activity-info {
+  background: rgba(59,130,246,0.15) !important;
+  border-left-color: #3b82f6 !important;
+}
+body.dark .activity-label { color: var(--text) !important; }
+body.dark .activity-sub   { color: var(--text-muted) !important; }

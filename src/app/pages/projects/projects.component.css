@@ -1,3 +1,31 @@
+/* ── Card header row (status tag + action buttons) ── */
+.card-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+
+/* ── Card chips (meta info row) ── */
+.card-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+/* ── Search field expands to fill controls row ── */
+/* (full rules are in the controls-row section below) */
+
+/* ── Full-width form field ── */
+.full-width { grid-column: 1 / -1; }
+
+/* ── Priority tag (small) ── */
+.priority-tag-sm {
+  font-size: 0.72rem !important;
+  padding: 2px 8px !important;
+}
+
 .projects-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -196,9 +224,27 @@
 /* ── Search + sort controls ── */
 .controls-row {
   display: flex;
+  align-items: center;
   gap: 12px;
   margin-bottom: 24px;
 }
+
+/* Stretch the p-iconField host + its inner span and input */
+.search-field {
+  flex: 1;
+  display: flex;
+}
+::ng-deep .search-field .p-iconfield,
+::ng-deep .search-field span.p-iconfield {
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+::ng-deep .search-field .p-iconfield input.p-inputtext {
+  flex: 1;
+  min-width: 0;
+}
+
 .search-input {
   flex: 1;
   padding: 9px 14px;
@@ -210,16 +256,9 @@
   color: var(--text);
 }
 .search-input:focus { outline: none; border-color: var(--primary); }
-.sort-select {
-  padding: 9px 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font-size: 0.88rem;
-  font-family: inherit;
-  background: var(--surface);
-  color: var(--text);
-  cursor: pointer;
-}
+
+/* Sort dropdown — keep PrimeNG's own styling, just fix width */
+.sort-select { width: 160px !important; }
 
 /* ── Project grid ── */
 .project-grid {
@@ -389,3 +428,25 @@
   color: var(--primary);
   border: 1px solid rgba(99,102,241,0.25);
 }
+
+/* \u2500\u2500 Dark mode overrides \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+
+/* Status badge pills (legacy classes still used in CSS) */
+body.dark .status-completed { background: rgba(34,197,94,0.15);   color: #86efac; }
+body.dark .status-progress  { background: rgba(59,130,246,0.15);  color: #93c5fd; }
+body.dark .status-review    { background: rgba(245,158,11,0.15);  color: #fde68a; }
+body.dark .status-default   { background: rgba(148,163,184,0.15); color: #94a3b8; }
+body.dark .status-hold      { background: rgba(34,197,94,0.10);   color: #6ee7b7; }
+body.dark .status-cancelled { background: rgba(239,68,68,0.15);   color: #fca5a5; }
+
+/* Overdue chip on project cards */
+body.dark .chip-overdue { background: rgba(239,68,68,0.18) !important; color: #fca5a5 !important; border-color: rgba(239,68,68,0.35) !important; }
+
+/* Badge variants (unused in HTML but kept for CSS completeness) */
+body.dark .badge-blue  { background: rgba(59,130,246,0.18); color: #93c5fd; border-color: rgba(59,130,246,0.35); }
+body.dark .badge-green { background: rgba(34,197,94,0.18);  color: #86efac; border-color: rgba(34,197,94,0.35); }
+
+/* Hover feedback buttons */
+body.dark .btn-edit:hover   { background: rgba(59,130,246,0.15); }
+body.dark .btn-delete:hover { background: rgba(239,68,68,0.15); }
+body.dark .btn-close:hover  { background: rgba(239,68,68,0.15); }

@@ -1,20 +1,32 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { NgClass } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { MessageService, PrimeTemplate } from 'primeng/api';
+import { Toast } from 'primeng/toast';
+import { Dialog } from 'primeng/dialog';
+import { Button } from 'primeng/button';
+import { InputText } from 'primeng/inputtext';
+import { Select } from 'primeng/select';
+import { Tag } from 'primeng/tag';
+import { ProgressBar } from 'primeng/progressbar';
+import { Chip } from 'primeng/chip';
+import { Toolbar } from 'primeng/toolbar';
+import { IconField } from 'primeng/iconfield';
+import { InputIcon } from 'primeng/inputicon';
+import { Card } from 'primeng/card';
 import { ProjectService, Project } from '../../services/project.service';
 import { TaskService, Task } from '../../services/task.service';
-import { UserService } from '../../services/user.service';
-import { TEAM_MEMBERS } from '../../services/user.service';
+import { UserService, TEAM_MEMBERS } from '../../services/user.service';
 
 type SortField = 'name' | 'status' | 'endDate' | '';
 
 @Component({
   selector: 'app-projects',
   standalone: true,
-  imports: [NgClass, ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, FormsModule, RouterLink, PrimeTemplate, Toast, Dialog, Button, InputText, Select, Tag, ProgressBar, Chip, Toolbar, IconField, InputIcon, Card],
   templateUrl: './projects.component.html',
   styleUrls: ['./projects.component.css']
 })
@@ -31,7 +43,15 @@ export class ProjectsComponent implements OnInit, OnDestroy {
 
   isManager = false;
   readonly teamMembers = TEAM_MEMBERS;
+  readonly teamMemberNames = TEAM_MEMBERS.map(m => m.name);
+  readonly projectStatuses = ['Not Started', 'In Progress', 'On Hold', 'Blocked', 'Completed'];
+  readonly sortOptions = [
+    { label: 'Name A–Z', value: 'name' },
+    { label: 'Status', value: 'status' },
+    { label: 'Deadline', value: 'endDate' },
+  ];
 
+  private readonly messageService = inject(MessageService);
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -117,6 +137,7 @@ export class ProjectsComponent implements OnInit, OnDestroy {
   setSortField(e: Event): void {
     this.sortField = (e.target as HTMLSelectElement).value as SortField;
   }
+  setSortValue(value: string): void { this.sortField = value as SortField; }
   setSearchQuery(e: Event): void {
     this.searchQuery = (e.target as HTMLInputElement).value;
   }
@@ -173,8 +194,19 @@ export class ProjectsComponent implements OnInit, OnDestroy {
     a.click();
   }
 
+  getStatusSeverity(status: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' {
+    const map: Record<string, 'success' | 'info' | 'warn' | 'danger' | 'secondary'> = {
+      'Completed': 'success', 'In Progress': 'info', 'On Hold': 'warn', 'Blocked': 'danger', 'Not Started': 'secondary'
+    };
+    return map[status] ?? 'secondary';
+  }
+
   private showToast(message: string, type: 'success' | 'error' = 'success'): void {
-    this.toast = { message, type };
-    setTimeout(() => (this.toast = null), 3000);
+    this.messageService.add({
+      severity: type === 'error' ? 'error' : 'success',
+      summary: type === 'error' ? 'Error' : 'Success',
+      detail: message,
+      life: 3000
+    });
   }
 }

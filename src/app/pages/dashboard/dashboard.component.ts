@@ -2,6 +2,10 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { combineLatest, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { ProgressBar } from 'primeng/progressbar';
+import { UIChart } from 'primeng/chart';
+import { Card } from 'primeng/card';
+import { Panel } from 'primeng/panel';
 import { ProjectService, Project } from '../../services/project.service';
 import { TaskService, Task } from '../../services/task.service';
 
@@ -23,7 +27,7 @@ interface ProjectProgress {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [NgClass],
+  imports: [NgClass, ProgressBar, UIChart, Card, Panel],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
@@ -40,6 +44,27 @@ export class DashboardComponent implements OnInit, OnDestroy {
   get completionRate(): number {
     const total = this.completedTasks + this.pendingTasks;
     return total === 0 ? 0 : Math.round((this.completedTasks / total) * 100);
+  }
+
+  get chartData() {
+    const { todo, inProgress, inReview, done } = this.taskStatusCounts;
+    return {
+      labels: ['Done', 'In Review', 'In Progress', 'Todo'],
+      datasets: [{
+        data: [done, inReview, inProgress, todo],
+        backgroundColor: ['#22c55e', '#6366f1', '#f59e0b', '#94a3b8'],
+        hoverBackgroundColor: ['#16a34a', '#4f46e5', '#d97706', '#64748b'],
+        borderWidth: 0
+      }]
+    };
+  }
+
+  get chartOptions() {
+    return {
+      plugins: { legend: { position: 'bottom', labels: { padding: 20, font: { family: 'Inter' } } } },
+      cutout: '68%',
+      animation: { duration: 600 }
+    };
   }
 
   get taskStatusCounts(): { todo: number; inProgress: number; inReview: number; done: number } {
